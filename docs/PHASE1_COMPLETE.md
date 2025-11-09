@@ -17,10 +17,11 @@ DNDGame-Retro/
 │   ├── prompts.py           # DM prompt templates
 │   ├── server.py            # FastAPI server
 │   └── cli.py               # Typer CLI interface
+├── data/
+│   └── dndgame.db          # SQLite database
 ├── pyproject.toml           # Project configuration & dependencies
 ├── .env.example             # Environment template
-├── .env                     # Local environment config
-└── dndgame.db              # SQLite database
+└── .env                     # Local environment config
 ```
 
 ### 2. Configuration Management ✅
@@ -218,7 +219,7 @@ PORT=8000
 DEBUG=true
 
 # Database
-DATABASE_URL=sqlite:///./dndgame.db
+DATABASE_URL=sqlite:///./data/dndgame.db
 ```
 
 ## Next Steps

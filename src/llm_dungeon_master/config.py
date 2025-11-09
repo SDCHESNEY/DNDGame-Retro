@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     debug: bool = True
     
     # Database Configuration
-    database_url: str = "sqlite:///./dndgame.db"
+    database_url: str = "sqlite:///./data/dndgame.db"
     
     # Security
     secret_key: str = "dev-secret-key-change-in-production"

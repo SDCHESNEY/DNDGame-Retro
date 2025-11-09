@@ -85,8 +85,8 @@ def test_database_url_formats():
     assert settings.database_url == "sqlite:///:memory:"
     
     # SQLite file
-    settings.database_url = "sqlite:///./dndgame.db"
-    assert settings.database_url == "sqlite:///./dndgame.db"
+    settings.database_url = "sqlite:///./data/dndgame.db"
+    assert settings.database_url == "sqlite:///./data/dndgame.db"
     
     # PostgreSQL
     settings.database_url = "postgresql://user:pass@localhost/dbname"
