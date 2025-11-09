@@ -602,6 +602,367 @@ def sync_check(session_id: int = typer.Argument(..., help="Session ID")):
                 console.print(f"  • {conflict_type}: {count}")
 
 
+# ============================================================================
+# Content Generation Commands
+# ============================================================================
+
+@app.command()
+def gen_encounter(
+    levels: str = typer.Argument(..., help="Party levels (comma-separated, e.g., '5,5,6,7')"),
+    difficulty: str = typer.Option("medium", help="Difficulty: easy, medium, hard, deadly"),
+    environment: str = typer.Option("dungeon", help="Environment: dungeon, forest, mountains, etc.")
+):
+    """Generate a random encounter."""
+    from .content import EncounterGenerator, EncounterDifficulty, Environment
+    
+    # Parse party levels
+    party_levels = [int(l.strip()) for l in levels.split(",")]
+    
+    # Parse difficulty
+    try:
+        diff = EncounterDifficulty(difficulty.lower())
+    except ValueError:
+        console.print(f"[red]Invalid difficulty: {difficulty}[/red]")
+        console.print("Valid values: easy, medium, hard, deadly")
+        raise typer.Exit(1)
+    
+    # Parse environment
+    try:
+        env = Environment(environment.lower())
+    except ValueError:
+        console.print(f"[red]Invalid environment: {environment}[/red]")
+        console.print("Valid values: dungeon, forest, mountains, swamp, desert, urban, underdark, coastal")
+        raise typer.Exit(1)
+    
+    # Generate encounter
+    generator = EncounterGenerator()
+    encounter = generator.generate_encounter(party_levels, diff, env)
+    
+    # Display
+    output = generator.format_encounter(encounter)
+    console.print(Panel(output, title="[bold cyan]Encounter Generated[/bold cyan]", border_style="cyan"))
+
+
+@app.command()
+def gen_loot(
+    cr: float = typer.Argument(..., help="Challenge Rating"),
+    hoard: bool = typer.Option(False, help="Generate hoard treasure instead of individual")
+):
+    """Generate random loot/treasure."""
+    from .content import LootGenerator
+    
+    generator = LootGenerator()
+    treasure = generator.generate_treasure(cr, hoard)
+    
+    # Display
+    output = generator.format_treasure(treasure)
+    console.print(Panel(output, title="[bold yellow]Treasure Generated[/bold yellow]", border_style="yellow"))
+
+
+@app.command()
+def gen_npc(
+    role: Optional[str] = typer.Option(None, help="NPC role: merchant, guard, noble, etc."),
+    race: Optional[str] = typer.Option(None, help="NPC race: human, elf, dwarf, etc.")
+):
+    """Generate a random NPC."""
+    from .content import NPCGenerator, NPCRole
+    
+    # Parse role
+    npc_role = None
+    if role:
+        try:
+            npc_role = NPCRole(role.lower())
+        except ValueError:
+            console.print(f"[red]Invalid role: {role}[/red]")
+            console.print("Valid values: merchant, guard, noble, commoner, priest, warrior, rogue, mage, innkeeper, blacksmith")
+            raise typer.Exit(1)
+    
+    generator = NPCGenerator()
+    npc = generator.generate_npc(npc_role, race)
+    
+    # Display
+    output = generator.format_npc(npc)
+    console.print(Panel(output, title="[bold magenta]NPC Generated[/bold magenta]", border_style="magenta"))
+
+
+@app.command()
+def gen_dungeon(
+    theme: Optional[str] = typer.Option(None, help="Theme: crypt, mine, fortress, cave, temple, tower"),
+    rooms: int = typer.Option(6, help="Number of rooms")
+):
+    """Generate a random dungeon."""
+    from .content import LocationGenerator, DungeonTheme
+    
+    # Parse theme
+    dungeon_theme = None
+    if theme:
+        try:
+            dungeon_theme = DungeonTheme(theme.lower())
+        except ValueError:
+            console.print(f"[red]Invalid theme: {theme}[/red]")
+            console.print("Valid values: crypt, mine, fortress, cave, temple, tower")
+            raise typer.Exit(1)
+    
+    generator = LocationGenerator()
+    location = generator.generate_dungeon(dungeon_theme, rooms)
+    
+    # Display
+    output = generator.format_location(location)
+    console.print(Panel(output, title="[bold red]Dungeon Generated[/bold red]", border_style="red"))
+
+
+@app.command()
+def gen_settlement(
+    size: str = typer.Option("town", help="Size: village, town, city")
+):
+    """Generate a random settlement."""
+    from .content import LocationGenerator
+    
+    if size not in ["village", "town", "city"]:
+        console.print(f"[red]Invalid size: {size}[/red]")
+        console.print("Valid values: village, town, city")
+        raise typer.Exit(1)
+    
+    generator = LocationGenerator()
+    location = generator.generate_settlement(size)
+    
+    # Display
+    output = generator.format_location(location)
+    console.print(Panel(output, title="[bold green]Settlement Generated[/bold green]", border_style="green"))
+
+
+@app.command()
+def gen_wilderness(
+    terrain: str = typer.Option("forest", help="Terrain: forest, mountains, swamp")
+):
+    """Generate a random wilderness area."""
+    from .content import LocationGenerator
+    
+    if terrain not in ["forest", "mountains", "swamp"]:
+        console.print(f"[red]Invalid terrain: {terrain}[/red]")
+        console.print("Valid values: forest, mountains, swamp")
+        raise typer.Exit(1)
+    
+    generator = LocationGenerator()
+    location = generator.generate_wilderness(terrain)
+    
+    # Display
+    output = generator.format_location(location)
+    console.print(Panel(output, title="[bold blue]Wilderness Generated[/bold blue]", border_style="blue"))
+
+
+# ============================================================================
+# Quality of Life Commands
+# ============================================================================
+
+@app.command()
+def session_save(
+    session_id: int = typer.Argument(..., help="Session ID to save"),
+    note: Optional[str] = typer.Option(None, help="Optional save note")
+):
+    """Save session state to file."""
+    from .qol import SessionStateManager
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        
+        try:
+            metadata = {"note": note} if note else None
+            filepath = manager.save_session(session_id, metadata)
+            console.print(f"[green]✓ Session saved to: {filepath}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error saving session: {e}[/red]")
+            raise typer.Exit(1)
+
+
+@app.command()
+def session_load(
+    filepath: str = typer.Argument(..., help="Path to save file")
+):
+    """Load session state from file."""
+    from pathlib import Path
+    from .qol import SessionStateManager
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        
+        try:
+            snapshot = manager.load_session(Path(filepath))
+            console.print(f"[green]✓ Session loaded: {snapshot.session_name}[/green]")
+            console.print(f"  Session ID: {snapshot.session_id}")
+            console.print(f"  Saved: {snapshot.saved_at}")
+            console.print(f"  Players: {len(snapshot.players)}")
+            console.print(f"  Characters: {len(snapshot.characters)}")
+        except Exception as e:
+            console.print(f"[red]Error loading session: {e}[/red]")
+            raise typer.Exit(1)
+
+
+@app.command()
+def session_saves(
+    session_id: Optional[int] = typer.Option(None, help="Filter by session ID")
+):
+    """List available save files."""
+    from .qol import SessionStateManager
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        saves = manager.list_saves(session_id)
+        
+        if not saves:
+            console.print("[yellow]No save files found[/yellow]")
+            return
+        
+        console.print(f"[bold]Available Saves ({len(saves)}):[/bold]\n")
+        
+        for save in saves[:10]:  # Show recent 10
+            info = manager.get_save_info(save)
+            console.print(f"  [cyan]{info['filename']}[/cyan]")
+            console.print(f"    Session: {info['session_name']} (ID: {info['session_id']})")
+            console.print(f"    Saved: {info['saved_at']}")
+            console.print(f"    {info['num_characters']} characters, {info['num_messages']} messages\n")
+
+
+@app.command()
+def history_search(
+    session_id: int = typer.Argument(..., help="Session ID"),
+    query: str = typer.Argument(..., help="Search query"),
+    sender: Optional[str] = typer.Option(None, help="Filter by sender"),
+    limit: int = typer.Option(20, help="Maximum results")
+):
+    """Search message history."""
+    from .qol import MessageHistoryManager
+    
+    with DBSession(engine) as db:
+        manager = MessageHistoryManager(db)
+        messages = manager.search_messages(session_id, query, sender=sender, limit=limit)
+        
+        if not messages:
+            console.print("[yellow]No messages found[/yellow]")
+            return
+        
+        console.print(f"[bold]Found {len(messages)} messages:[/bold]\n")
+        
+        for msg in messages:
+            timestamp = msg.timestamp.strftime("%Y-%m-%d %H:%M") if msg.timestamp else "Unknown"
+            console.print(f"[cyan][{timestamp}] {msg.sender}:[/cyan]")
+            console.print(f"  {msg.content[:100]}...\n")
+
+
+@app.command()
+def history_export(
+    session_id: int = typer.Argument(..., help="Session ID"),
+    output: str = typer.Argument(..., help="Output file path"),
+    format: str = typer.Option("text", help="Format: text, json, markdown")
+):
+    """Export message history."""
+    from .qol import MessageHistoryManager
+    
+    with DBSession(engine) as db:
+        manager = MessageHistoryManager(db)
+        
+        try:
+            content = manager.export_history(session_id, format)
+            
+            with open(output, 'w') as f:
+                f.write(content)
+            
+            console.print(f"[green]✓ History exported to: {output}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error exporting history: {e}[/red]")
+            raise typer.Exit(1)
+
+
+@app.command()
+def stats_show(
+    session_id: Optional[int] = typer.Option(None, help="Session ID"),
+    character_id: Optional[int] = typer.Option(None, help="Character ID")
+):
+    """Show gameplay statistics."""
+    from .qol import StatisticsTracker
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        
+        if character_id:
+            stats = tracker.get_character_stats(character_id)
+            report = tracker.format_stats_report(stats)
+        elif session_id:
+            stats = tracker.get_session_stats(session_id)
+            report = tracker.format_stats_report(stats)
+        else:
+            console.print("[red]Please specify --session-id or --character-id[/red]")
+            raise typer.Exit(1)
+        
+        console.print(Panel(report, title="[bold cyan]Statistics[/bold cyan]", border_style="cyan"))
+
+
+@app.command()
+def stats_leaderboard(
+    session_id: int = typer.Argument(..., help="Session ID"),
+    metric: str = typer.Option("messages", help="Metric: messages, rolls, crits")
+):
+    """Show leaderboard for a metric."""
+    from .qol import StatisticsTracker
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        rankings = tracker.get_leaderboard(session_id, metric)
+        
+        if not rankings:
+            console.print("[yellow]No data for leaderboard[/yellow]")
+            return
+        
+        table = Table(title=f"{metric.title()} Leaderboard")
+        table.add_column("Rank", style="cyan")
+        table.add_column("Player", style="green")
+        table.add_column("Count", style="yellow")
+        
+        for i, entry in enumerate(rankings[:10], 1):
+            table.add_row(str(i), entry['player'], str(entry['count']))
+        
+        console.print(table)
+
+
+@app.command()
+def alias_add(
+    alias: str = typer.Argument(..., help="Alias shortcut"),
+    command: str = typer.Argument(..., help="Full command")
+):
+    """Add a command alias."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    manager.add_alias(alias, command)
+    console.print(f"[green]✓ Alias added: {alias} -> {command}[/green]")
+
+
+@app.command()
+def alias_remove(
+    alias: str = typer.Argument(..., help="Alias to remove")
+):
+    """Remove a command alias."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    if manager.remove_alias(alias):
+        console.print(f"[green]✓ Alias removed: {alias}[/green]")
+    else:
+        console.print(f"[yellow]Alias not found or cannot be removed: {alias}[/yellow]")
+
+
+@app.command()
+def alias_list(
+    custom_only: bool = typer.Option(False, help="Show only custom aliases")
+):
+    """List all command aliases."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    output = manager.format_aliases()
+    console.print(output)
+
+
 @app.command()
 def play(
     session_id: Optional[int] = typer.Option(None, help="Session ID to join"),

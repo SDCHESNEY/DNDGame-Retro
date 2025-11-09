@@ -22,6 +22,12 @@ from .rules.dice import (
 )
 from .rules.combat import CombatManager, ActionType
 from .rules.conditions import ConditionManager, ConditionType, DurationType
+from .content import (
+    EncounterGenerator, EncounterDifficulty, Environment,
+    LootGenerator, TreasureType,
+    NPCGenerator, NPCRole,
+    LocationGenerator, LocationType, DungeonTheme
+)
 
 
 # Database setup
@@ -1282,7 +1288,463 @@ async def get_token_info(token: str, db: DBSession = Depends(get_db)):
     return info
 
 
+# ============================================================================
+# Content Generation Endpoints
+# ============================================================================
+
+@app.post("/api/encounters/generate")
+async def generate_encounter(
+    party_levels: list[int],
+    difficulty: EncounterDifficulty = EncounterDifficulty.MEDIUM,
+    environment: Environment = Environment.DUNGEON
+):
+    """Generate a balanced encounter."""
+    generator = EncounterGenerator()
+    encounter = generator.generate_encounter(party_levels, difficulty, environment)
+    
+    return {
+        "monsters": [
+            {
+                "name": m.name,
+                "cr": m.cr,
+                "xp": m.xp,
+                "count": m.count,
+                "hp": m.hp,
+                "ac": m.ac,
+                "description": m.description
+            }
+            for m in encounter.monsters
+        ],
+        "total_xp": encounter.total_xp,
+        "adjusted_xp": encounter.adjusted_xp,
+        "difficulty": encounter.difficulty.value,
+        "environment": encounter.environment.value,
+        "description": encounter.description,
+        "treasure_cr": encounter.treasure_cr
+    }
+
+
+@app.get("/api/encounters/difficulties")
+async def get_encounter_difficulties():
+    """Get available encounter difficulty levels."""
+    return [d.value for d in EncounterDifficulty]
+
+
+@app.get("/api/encounters/environments")
+async def get_encounter_environments():
+    """Get available encounter environments."""
+    return [e.value for e in Environment]
+
+
+@app.post("/api/loot/generate")
+async def generate_loot(
+    cr: float,
+    is_hoard: bool = False
+):
+    """Generate treasure for a given CR."""
+    generator = LootGenerator()
+    treasure = generator.generate_treasure(cr, is_hoard)
+    
+    return {
+        "currency": {
+            "copper": treasure.currency.copper,
+            "silver": treasure.currency.silver,
+            "electrum": treasure.currency.electrum,
+            "gold": treasure.currency.gold,
+            "platinum": treasure.currency.platinum,
+        },
+        "gems": treasure.gems,
+        "art_objects": treasure.art_objects,
+        "magic_items": [
+            {
+                "name": item.name,
+                "rarity": item.rarity.value,
+                "type": item.type,
+                "description": item.description
+            }
+            for item in treasure.magic_items
+        ],
+        "treasure_type": treasure.treasure_type.value,
+        "total_value": treasure.total_value
+    }
+
+
+@app.get("/api/loot/treasure-types")
+async def get_treasure_types():
+    """Get available treasure types."""
+    return [t.value for t in TreasureType]
+
+
+@app.post("/api/npcs/generate")
+async def generate_npc(
+    role: Optional[NPCRole] = None,
+    race: Optional[str] = None
+):
+    """Generate an NPC with personality and stats."""
+    generator = NPCGenerator()
+    npc = generator.generate_npc(role, race)
+    
+    return {
+        "name": npc.name,
+        "race": npc.race,
+        "role": npc.role.value,
+        "alignment": npc.alignment.value,
+        "personality_traits": npc.personality_traits,
+        "ideal": npc.ideal,
+        "bond": npc.bond,
+        "flaw": npc.flaw,
+        "background": npc.background,
+        "motivation": npc.motivation,
+        "stats": {
+            "str": npc.stats.str,
+            "dex": npc.stats.dex,
+            "con": npc.stats.con,
+            "int": npc.stats.int,
+            "wis": npc.stats.wis,
+            "cha": npc.stats.cha,
+            "ac": npc.stats.ac,
+            "hp": npc.stats.hp,
+            "cr": npc.stats.cr
+        },
+        "description": npc.description
+    }
+
+
+@app.get("/api/npcs/roles")
+async def get_npc_roles():
+    """Get available NPC roles."""
+    return [r.value for r in NPCRole]
+
+
+@app.get("/api/npcs/races")
+async def get_npc_races():
+    """Get available NPC races."""
+    from .content.npcs import NPCGenerator
+    gen = NPCGenerator()
+    return list(gen.FIRST_NAMES.keys())
+
+
+@app.post("/api/locations/generate")
+async def generate_location(
+    location_type: LocationType,
+    theme: Optional[DungeonTheme] = None,
+    terrain: str = "forest",
+    size: str = "town",
+    num_rooms: int = 6
+):
+    """Generate a location (dungeon, settlement, or wilderness)."""
+    generator = LocationGenerator()
+    
+    if location_type == LocationType.DUNGEON:
+        location = generator.generate_dungeon(theme, num_rooms)
+    elif location_type == LocationType.SETTLEMENT:
+        location = generator.generate_settlement(size)
+    elif location_type == LocationType.WILDERNESS:
+        location = generator.generate_wilderness(terrain)
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported location type: {location_type}")
+    
+    return {
+        "name": location.name,
+        "type": location.type.value,
+        "description": location.description,
+        "atmosphere": location.atmosphere,
+        "notable_features": location.notable_features,
+        "inhabitants": location.inhabitants,
+        "hooks": location.hooks,
+        "rooms": [
+            {
+                "name": room.name,
+                "description": room.description,
+                "features": room.features,
+                "connections": room.connections,
+                "hazards": room.hazards,
+                "treasure": room.treasure
+            }
+            for room in location.rooms
+        ]
+    }
+
+
+@app.get("/api/locations/types")
+async def get_location_types():
+    """Get available location types."""
+    return [t.value for t in LocationType]
+
+
+@app.get("/api/locations/dungeon-themes")
+async def get_dungeon_themes():
+    """Get available dungeon themes."""
+    return [t.value for t in DungeonTheme]
+
+
 # WebSocket endpoint
+# ============================================================================
+# Quality of Life Endpoints
+# ============================================================================
+
+@app.post("/api/session/{session_id}/save")
+async def save_session_state(
+    session_id: int,
+    note: Optional[str] = None
+):
+    """Save session state to file."""
+    from .qol import SessionStateManager
+    from pathlib import Path
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        
+        try:
+            metadata = {"note": note} if note else None
+            filepath = manager.save_session(session_id, metadata)
+            
+            return {
+                "success": True,
+                "filepath": str(filepath),
+                "filename": filepath.name
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/session/{session_id}/saves")
+async def list_session_saves(session_id: int):
+    """List available save files for a session."""
+    from .qol import SessionStateManager
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        saves = manager.list_saves(session_id)
+        
+        return {
+            "saves": [
+                manager.get_save_info(save)
+                for save in saves[:20]  # Return recent 20
+            ]
+        }
+
+
+@app.post("/api/session/load")
+async def load_session_state(filepath: str):
+    """Load session state from file."""
+    from pathlib import Path
+    from .qol import SessionStateManager
+    
+    with DBSession(engine) as db:
+        manager = SessionStateManager(db)
+        
+        try:
+            snapshot = manager.load_session(Path(filepath))
+            
+            return {
+                "session_id": snapshot.session_id,
+                "session_name": snapshot.session_name,
+                "created_at": snapshot.created_at,
+                "saved_at": snapshot.saved_at,
+                "players": snapshot.players,
+                "characters": snapshot.characters,
+                "recent_messages": snapshot.recent_messages,
+                "metadata": snapshot.metadata
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/session/{session_id}/history")
+async def get_message_history(
+    session_id: int,
+    limit: int = 50,
+    offset: int = 0
+):
+    """Get message history with pagination."""
+    from .qol import MessageHistoryManager
+    
+    with DBSession(engine) as db:
+        manager = MessageHistoryManager(db)
+        messages = manager.get_recent_messages(session_id, limit, offset)
+        
+        return {
+            "messages": [
+                {
+                    "id": msg.id,
+                    "sender": msg.sender,
+                    "content": msg.content,
+                    "message_type": msg.message_type,
+                    "timestamp": msg.timestamp.isoformat() if msg.timestamp else None
+                }
+                for msg in messages
+            ]
+        }
+
+
+@app.get("/api/session/{session_id}/history/search")
+async def search_message_history(
+    session_id: int,
+    query: str,
+    sender: Optional[str] = None,
+    message_type: Optional[str] = None,
+    limit: int = 50
+):
+    """Search message history."""
+    from .qol import MessageHistoryManager
+    
+    with DBSession(engine) as db:
+        manager = MessageHistoryManager(db)
+        messages = manager.search_messages(
+            session_id, query, sender=sender, message_type=message_type, limit=limit
+        )
+        
+        return {
+            "query": query,
+            "results": [
+                {
+                    "id": msg.id,
+                    "sender": msg.sender,
+                    "content": msg.content,
+                    "message_type": msg.message_type,
+                    "timestamp": msg.timestamp.isoformat() if msg.timestamp else None
+                }
+                for msg in messages
+            ]
+        }
+
+
+@app.get("/api/session/{session_id}/history/export")
+async def export_message_history(
+    session_id: int,
+    format: str = "text"
+):
+    """Export message history."""
+    from .qol import MessageHistoryManager
+    
+    with DBSession(engine) as db:
+        manager = MessageHistoryManager(db)
+        content = manager.export_history(session_id, format)
+        
+        return {
+            "format": format,
+            "content": content
+        }
+
+
+@app.get("/api/session/{session_id}/stats")
+async def get_session_statistics(session_id: int):
+    """Get comprehensive session statistics."""
+    from .qol import StatisticsTracker
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        stats = tracker.get_session_stats(session_id)
+        
+        return stats
+
+
+@app.get("/api/character/{character_id}/stats")
+async def get_character_statistics(character_id: int):
+    """Get character statistics."""
+    from .qol import StatisticsTracker
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        stats = tracker.get_character_stats(character_id)
+        
+        if not stats:
+            raise HTTPException(status_code=404, detail="Character not found")
+        
+        return stats
+
+
+@app.get("/api/session/{session_id}/leaderboard")
+async def get_session_leaderboard(
+    session_id: int,
+    metric: str = "messages"
+):
+    """Get leaderboard for a session metric."""
+    from .qol import StatisticsTracker
+    
+    if metric not in ["messages", "rolls", "crits"]:
+        raise HTTPException(status_code=400, detail="Invalid metric")
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        rankings = tracker.get_leaderboard(session_id, metric)
+        
+        return {
+            "metric": metric,
+            "rankings": rankings
+        }
+
+
+@app.get("/api/session/{session_id}/activity")
+async def get_player_activity(
+    session_id: int,
+    days: int = 7
+):
+    """Get player activity over time."""
+    from .qol import StatisticsTracker
+    
+    with DBSession(engine) as db:
+        tracker = StatisticsTracker(db)
+        activity = tracker.get_player_activity(session_id, days)
+        
+        return activity
+
+
+@app.get("/api/aliases")
+async def get_command_aliases():
+    """Get all command aliases."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    aliases = manager.list_aliases()
+    
+    return {"aliases": aliases}
+
+
+@app.post("/api/aliases")
+async def add_command_alias(alias: str, command: str):
+    """Add a command alias."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    success = manager.add_alias(alias, command)
+    
+    return {
+        "success": success,
+        "alias": alias,
+        "command": command
+    }
+
+
+@app.delete("/api/aliases/{alias}")
+async def remove_command_alias(alias: str):
+    """Remove a command alias."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    success = manager.remove_alias(alias)
+    
+    if not success:
+        raise HTTPException(status_code=404, detail="Alias not found or cannot be removed")
+    
+    return {"success": True}
+
+
+@app.post("/api/aliases/expand")
+async def expand_command_alias(command: str):
+    """Expand an alias to its full command."""
+    from .qol import AliasManager
+    
+    manager = AliasManager()
+    expanded = manager.expand_alias(command)
+    
+    return {
+        "original": command,
+        "expanded": expanded
+    }
+
+
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: int):
     """WebSocket endpoint for real-time game communication."""
