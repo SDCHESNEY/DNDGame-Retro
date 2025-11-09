@@ -1,0 +1,44 @@
+{
+  "class": "Wizard",
+  "description": "A scholarly magic-user capable of manipulating the structures of reality",
+  "hit_die": "d6",
+  "primary_abilities": ["Intelligence"],
+  "saving_throw_proficiencies": ["Intelligence", "Wisdom"],
+  "armor_proficiencies": [],
+  "weapon_proficiencies": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light crossbows"],
+  "skill_choices": 2,
+  "skill_options": ["Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"],
+  "starting_equipment": [
+    "Quarterstaff or dagger",
+    "Component pouch or arcane focus",
+    "Scholar's pack or explorer's pack",
+    "Spellbook"
+  ],
+  "starting_gold": "4d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Spellcasting",
+      "description": "You know 3 cantrips and can prepare Intelligence modifier + level spells from your spellbook"
+    },
+    {
+      "name": "Arcane Recovery",
+      "description": "Once per day during a short rest, recover spell slots totaling up to half your wizard level (rounded up)"
+    }
+  ],
+  "spellcasting": {
+    "cantrips_known": 3,
+    "spells_known": 6,
+    "spell_slots": {
+      "1": 2
+    }
+  },
+  "ability_score_priority": ["Intelligence", "Constitution", "Dexterity"],
+  "recommended_stats": {
+    "Strength": 8,
+    "Dexterity": 13,
+    "Constitution": 14,
+    "Intelligence": 15,
+    "Wisdom": 12,
+    "Charisma": 10
+  }
+}

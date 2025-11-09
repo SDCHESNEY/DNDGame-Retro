@@ -1,0 +1,44 @@
+{
+  "class": "Cleric",
+  "description": "A priestly champion who wields divine magic in service of a higher power",
+  "hit_die": "d8",
+  "primary_abilities": ["Wisdom"],
+  "saving_throw_proficiencies": ["Wisdom", "Charisma"],
+  "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+  "weapon_proficiencies": ["Simple weapons"],
+  "skill_choices": 2,
+  "skill_options": ["History", "Insight", "Medicine", "Persuasion", "Religion"],
+  "starting_equipment": [
+    "Mace or warhammer (if proficient)",
+    "Scale mail or leather armor or chain mail (if proficient)",
+    "Light crossbow and 20 bolts or simple weapon",
+    "Priest's pack or explorer's pack",
+    "Shield and holy symbol"
+  ],
+  "starting_gold": "5d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Spellcasting",
+      "description": "You know 3 cantrips and can prepare Wisdom modifier + level spells from the cleric spell list"
+    },
+    {
+      "name": "Divine Domain",
+      "description": "Choose a divine domain that grants domain spells and features (Life, Light, Knowledge, Nature, Tempest, Trickery, War)"
+    }
+  ],
+  "spellcasting": {
+    "cantrips_known": 3,
+    "spell_slots": {
+      "1": 2
+    }
+  },
+  "ability_score_priority": ["Wisdom", "Constitution", "Strength"],
+  "recommended_stats": {
+    "Strength": 13,
+    "Dexterity": 10,
+    "Constitution": 14,
+    "Intelligence": 8,
+    "Wisdom": 15,
+    "Charisma": 12
+  }
+}

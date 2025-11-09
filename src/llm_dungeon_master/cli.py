@@ -156,13 +156,41 @@ def list_players():
 
 # Character commands
 @app.command()
+def character_classes():
+    """List all available character classes."""
+    from .character_builder import CharacterBuilder
+    
+    with DBSession(engine) as db:
+        builder = CharacterBuilder(db)
+        classes = builder.list_available_classes()
+        
+        if not classes:
+            console.print("[yellow]No character classes found[/yellow]")
+            return
+        
+        console.print("\n[bold green]Available Character Classes:[/bold green]")
+        for cls in classes:
+            console.print(f"  • [cyan]{cls}[/cyan]")
+        console.print()
+
+
+@app.command()
 def create_character(
     player_id: int = typer.Argument(..., help="Player ID"),
     name: str = typer.Argument(..., help="Character name"),
-    race: str = typer.Option("Human", help="Character race"),
-    char_class: str = typer.Option("Fighter", help="Character class"),
+    race: str = typer.Argument(..., help="Character race"),
+    char_class: str = typer.Argument(..., help="Character class"),
+    strength: int = typer.Option(10, help="Strength score (8-15)"),
+    dexterity: int = typer.Option(10, help="Dexterity score (8-15)"),
+    constitution: int = typer.Option(10, help="Constitution score (8-15)"),
+    intelligence: int = typer.Option(10, help="Intelligence score (8-15)"),
+    wisdom: int = typer.Option(10, help="Wisdom score (8-15)"),
+    charisma: int = typer.Option(10, help="Charisma score (8-15)"),
+    background: Optional[str] = typer.Option(None, help="Character background"),
 ):
-    """Create a new character."""
+    """Create a new character from a class template using point buy."""
+    from .character_builder import CharacterBuilder, ValidationError
+    
     with DBSession(engine) as db:
         # Check if player exists
         player = db.get(Player, player_id)
@@ -170,31 +198,57 @@ def create_character(
             console.print(f"[red]Error: Player with ID {player_id} not found[/red]")
             raise typer.Exit(1)
         
-        character = Character(
-            player_id=player_id,
-            name=name,
-            race=race,
-            char_class=char_class,
-            level=1,
-            max_hp=10,
-            current_hp=10,
-            armor_class=10
-        )
-        db.add(character)
-        db.commit()
-        db.refresh(character)
+        builder = CharacterBuilder(db)
         
-        console.print(Panel(
-            f"[green]Character created successfully![/green]\n\n"
-            f"Name: {character.name}\n"
-            f"Race: {character.race}\n"
-            f"Class: {character.char_class}\n"
-            f"Level: {character.level}\n"
-            f"HP: {character.current_hp}/{character.max_hp}\n"
-            f"AC: {character.armor_class}",
-            title=f"🗡️ {character.name}",
-            border_style="green"
-        ))
+        ability_scores = {
+            "strength": strength,
+            "dexterity": dexterity,
+            "constitution": constitution,
+            "intelligence": intelligence,
+            "wisdom": wisdom,
+            "charisma": charisma
+        }
+        
+        try:
+            character = builder.create_from_template(
+                player_id=player_id,
+                name=name,
+                race=race,
+                char_class=char_class,
+                ability_scores=ability_scores,
+                background=background
+            )
+            
+            # Get character summary
+            summary = builder.get_character_summary(character)
+            
+            # Display character sheet
+            abilities_text = "\n".join([
+                f"{ability.upper()}: {summary['ability_scores'][ability]['score']} "
+                f"({summary['ability_scores'][ability]['modifier']:+d})"
+                for ability in ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+            ])
+            
+            console.print(Panel(
+                f"[green]Character created successfully![/green]\n\n"
+                f"[bold]{character.name}[/bold]\n"
+                f"Level {character.level} {character.race} {character.char_class}\n\n"
+                f"[bold]Ability Scores:[/bold]\n{abilities_text}\n\n"
+                f"[bold]Combat Stats:[/bold]\n"
+                f"HP: {character.current_hp}/{character.max_hp}\n"
+                f"AC: {character.armor_class}\n"
+                f"Initiative: {character.initiative_bonus:+d}\n"
+                f"Proficiency: +{character.proficiency_bonus}",
+                title=f"🗡️ {character.name}",
+                border_style="green"
+            ))
+            
+        except ValidationError as e:
+            console.print(f"[red]Validation Error: {e}[/red]")
+            raise typer.Exit(1)
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
 
 
 @app.command()
@@ -235,25 +289,85 @@ def list_characters(player_id: Optional[int] = typer.Option(None, help="Filter b
 @app.command()
 def show_character(character_id: int = typer.Argument(..., help="Character ID")):
     """Show detailed character information."""
+    from .character_builder import CharacterBuilder
+    
     with DBSession(engine) as db:
         character = db.get(Character, character_id)
         if not character:
             console.print(f"[red]Error: Character with ID {character_id} not found[/red]")
             raise typer.Exit(1)
         
+        builder = CharacterBuilder(db)
+        summary = builder.get_character_summary(character)
+        
+        # Build ability scores display
+        abilities = []
+        for ability in ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]:
+            score = summary["ability_scores"][ability]["score"]
+            mod = summary["ability_scores"][ability]["modifier"]
+            abilities.append(f"{ability.upper()[:3]}: {score} ({mod:+d})")
+        
+        abilities_row1 = " | ".join(abilities[:3])
+        abilities_row2 = " | ".join(abilities[3:])
+        
+        # Build features display
+        features_text = ""
+        if summary["features"]:
+            features_text = "\n\n[bold]Features:[/bold]\n"
+            for feat in summary["features"][:5]:  # Show first 5
+                features_text += f"• {feat['name']} ({feat['source']})\n"
+        
+        # Build proficiencies display
+        prof_text = ""
+        if summary["proficiencies"]["skills"]:
+            skills = ", ".join(summary["proficiencies"]["skills"])
+            prof_text += f"\n\n[bold]Skills:[/bold] {skills}"
+        
+        # Build spell slots display
+        spell_slots_text = ""
+        if summary["spell_slots"]:
+            spell_slots_text = "\n\n[bold]Spell Slots:[/bold]\n"
+            for level, slots in summary["spell_slots"].items():
+                spell_slots_text += f"Level {level}: {slots['current']}/{slots['max']} "
+        
         # Create character sheet
         info = f"""[bold green]{character.name}[/bold green]
 [yellow]Level {character.level} {character.race} {character.char_class}[/yellow]
+{character.background or ""}
 
 [bold]Ability Scores:[/bold]
-STR: {character.strength} | DEX: {character.dexterity} | CON: {character.constitution}
-INT: {character.intelligence} | WIS: {character.wisdom} | CHA: {character.charisma}
+{abilities_row1}
+{abilities_row2}
 
 [bold]Combat Stats:[/bold]
-HP: {character.current_hp}/{character.max_hp} | AC: {character.armor_class}
+HP: {character.current_hp}/{character.max_hp} | AC: {character.armor_class} | Initiative: {character.initiative_bonus:+d}
+Speed: {character.speed} ft | Proficiency: +{character.proficiency_bonus} | XP: {character.experience_points}{features_text}{prof_text}{spell_slots_text}
 """
         
         console.print(Panel(info, title="📜 Character Sheet", border_style="blue"))
+
+
+@app.command()
+def validate_character(character_id: int = typer.Argument(..., help="Character ID")):
+    """Validate a character's stats and configuration."""
+    from .character_builder import CharacterBuilder
+    
+    with DBSession(engine) as db:
+        character = db.get(Character, character_id)
+        if not character:
+            console.print(f"[red]Error: Character with ID {character_id} not found[/red]")
+            raise typer.Exit(1)
+        
+        builder = CharacterBuilder(db)
+        is_valid, errors = builder.validate_character(character)
+        
+        if is_valid:
+            console.print(f"[green]✓ Character '{character.name}' is valid![/green]")
+        else:
+            console.print(f"[red]✗ Character '{character.name}' has validation errors:[/red]")
+            for error in errors:
+                console.print(f"  • {error}")
+            raise typer.Exit(1)
 
 
 @app.command()

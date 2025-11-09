@@ -1,0 +1,38 @@
+{
+  "class": "Fighter",
+  "description": "A master of martial combat, skilled with a variety of weapons and armor",
+  "hit_die": "d10",
+  "primary_abilities": ["Strength", "Dexterity"],
+  "saving_throw_proficiencies": ["Strength", "Constitution"],
+  "armor_proficiencies": ["All armor", "Shields"],
+  "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+  "skill_choices": 2,
+  "skill_options": ["Acrobatics", "Animal Handling", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"],
+  "starting_equipment": [
+    "Chain mail (AC 16)",
+    "Martial weapon and shield",
+    "Light crossbow and 20 bolts",
+    "Dungeoneer's pack",
+    "Explorer's pack"
+  ],
+  "starting_gold": "5d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Fighting Style",
+      "description": "Choose a fighting style: Archery, Defense, Dueling, Great Weapon Fighting, Protection, or Two-Weapon Fighting"
+    },
+    {
+      "name": "Second Wind",
+      "description": "Regain 1d10 + fighter level hit points as a bonus action (1/short rest)"
+    }
+  ],
+  "ability_score_priority": ["Strength", "Constitution", "Dexterity"],
+  "recommended_stats": {
+    "Strength": 15,
+    "Dexterity": 13,
+    "Constitution": 14,
+    "Intelligence": 8,
+    "Wisdom": 10,
+    "Charisma": 12
+  }
+}

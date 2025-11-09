@@ -1,0 +1,37 @@
+{
+  "class": "Barbarian",
+  "description": "A fierce warrior of primitive background who can enter a battle rage",
+  "hit_die": "d12",
+  "primary_abilities": ["Strength"],
+  "saving_throw_proficiencies": ["Strength", "Constitution"],
+  "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+  "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+  "skill_choices": 2,
+  "skill_options": ["Animal Handling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"],
+  "starting_equipment": [
+    "Greataxe or martial melee weapon",
+    "Two handaxes or simple weapon",
+    "Explorer's pack",
+    "Four javelins"
+  ],
+  "starting_gold": "2d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Rage",
+      "description": "Enter a battle rage as a bonus action (2/long rest at level 1). While raging, gain +2 damage, advantage on Strength checks and saves, and resistance to physical damage"
+    },
+    {
+      "name": "Unarmored Defense",
+      "description": "While not wearing armor, your AC equals 10 + Dexterity modifier + Constitution modifier"
+    }
+  ],
+  "ability_score_priority": ["Strength", "Constitution", "Dexterity"],
+  "recommended_stats": {
+    "Strength": 15,
+    "Dexterity": 13,
+    "Constitution": 14,
+    "Intelligence": 8,
+    "Wisdom": 10,
+    "Charisma": 12
+  }
+}

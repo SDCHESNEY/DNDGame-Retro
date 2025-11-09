@@ -1,0 +1,47 @@
+{
+  "class": "Warlock",
+  "description": "A wielder of magic derived from a bargain with an extraplanar entity",
+  "hit_die": "d8",
+  "primary_abilities": ["Charisma"],
+  "saving_throw_proficiencies": ["Wisdom", "Charisma"],
+  "armor_proficiencies": ["Light armor"],
+  "weapon_proficiencies": ["Simple weapons"],
+  "skill_choices": 2,
+  "skill_options": ["Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"],
+  "starting_equipment": [
+    "Light crossbow and 20 bolts or simple weapon",
+    "Component pouch or arcane focus",
+    "Scholar's pack or dungeoneer's pack",
+    "Leather armor (AC 11 + Dex)",
+    "Simple weapon",
+    "Two daggers"
+  ],
+  "starting_gold": "4d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Otherworldly Patron",
+      "description": "Choose your patron: The Archfey, The Fiend, or The Great Old One. This grants you special abilities"
+    },
+    {
+      "name": "Pact Magic",
+      "description": "You know 2 cantrips and 2 spells from the warlock spell list. You regain spell slots on short or long rest"
+    }
+  ],
+  "spellcasting": {
+    "cantrips_known": 2,
+    "spells_known": 2,
+    "spell_slots": {
+      "1": 1
+    },
+    "pact_magic": true
+  },
+  "ability_score_priority": ["Charisma", "Constitution", "Dexterity"],
+  "recommended_stats": {
+    "Strength": 8,
+    "Dexterity": 13,
+    "Constitution": 14,
+    "Intelligence": 10,
+    "Wisdom": 12,
+    "Charisma": 15
+  }
+}

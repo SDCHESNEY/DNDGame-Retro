@@ -1,0 +1,44 @@
+{
+  "class": "Sorcerer",
+  "description": "A spellcaster who draws on inherent magic from a gift or bloodline",
+  "hit_die": "d6",
+  "primary_abilities": ["Charisma"],
+  "saving_throw_proficiencies": ["Constitution", "Charisma"],
+  "armor_proficiencies": [],
+  "weapon_proficiencies": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light crossbows"],
+  "skill_choices": 2,
+  "skill_options": ["Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"],
+  "starting_equipment": [
+    "Light crossbow and 20 bolts or simple weapon",
+    "Component pouch or arcane focus",
+    "Dungeoneer's pack or explorer's pack",
+    "Two daggers"
+  ],
+  "starting_gold": "3d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Spellcasting",
+      "description": "You know 4 cantrips and 2 spells from the sorcerer spell list. Charisma is your spellcasting ability"
+    },
+    {
+      "name": "Sorcerous Origin",
+      "description": "Choose your sorcerous origin: Draconic Bloodline or Wild Magic. This grants you special abilities"
+    }
+  ],
+  "spellcasting": {
+    "cantrips_known": 4,
+    "spells_known": 2,
+    "spell_slots": {
+      "1": 2
+    }
+  },
+  "ability_score_priority": ["Charisma", "Constitution", "Dexterity"],
+  "recommended_stats": {
+    "Strength": 8,
+    "Dexterity": 13,
+    "Constitution": 14,
+    "Intelligence": 10,
+    "Wisdom": 12,
+    "Charisma": 15
+  }
+}

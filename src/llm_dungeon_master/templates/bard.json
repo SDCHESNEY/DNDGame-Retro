@@ -1,0 +1,45 @@
+{
+  "class": "Bard",
+  "description": "An inspiring magician whose power echoes the music of creation",
+  "hit_die": "d8",
+  "primary_abilities": ["Charisma"],
+  "saving_throw_proficiencies": ["Dexterity", "Charisma"],
+  "armor_proficiencies": ["Light armor"],
+  "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+  "tool_proficiencies": ["Three musical instruments of your choice"],
+  "skill_choices": 3,
+  "skill_options": ["Any three skills"],
+  "starting_equipment": [
+    "Rapier or longsword or simple weapon",
+    "Diplomat's pack or entertainer's pack",
+    "Lute or other musical instrument",
+    "Leather armor and dagger"
+  ],
+  "starting_gold": "5d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Spellcasting",
+      "description": "You know 2 cantrips and 4 spells from the bard spell list. Charisma is your spellcasting ability"
+    },
+    {
+      "name": "Bardic Inspiration",
+      "description": "Grant an ally a d6 to add to an ability check, attack roll, or saving throw (Charisma modifier times per long rest)"
+    }
+  ],
+  "spellcasting": {
+    "cantrips_known": 2,
+    "spells_known": 4,
+    "spell_slots": {
+      "1": 2
+    }
+  },
+  "ability_score_priority": ["Charisma", "Dexterity", "Constitution"],
+  "recommended_stats": {
+    "Strength": 8,
+    "Dexterity": 14,
+    "Constitution": 12,
+    "Intelligence": 10,
+    "Wisdom": 13,
+    "Charisma": 15
+  }
+}

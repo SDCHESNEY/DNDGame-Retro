@@ -1,0 +1,37 @@
+{
+  "class": "Paladin",
+  "description": "A holy warrior bound to a sacred oath",
+  "hit_die": "d10",
+  "primary_abilities": ["Strength", "Charisma"],
+  "saving_throw_proficiencies": ["Wisdom", "Charisma"],
+  "armor_proficiencies": ["All armor", "Shields"],
+  "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+  "skill_choices": 2,
+  "skill_options": ["Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"],
+  "starting_equipment": [
+    "Martial weapon and shield or two martial weapons",
+    "Five javelins or simple melee weapon",
+    "Priest's pack or explorer's pack",
+    "Chain mail and holy symbol"
+  ],
+  "starting_gold": "5d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Divine Sense",
+      "description": "As an action, detect celestials, fiends, and undead within 60 feet (uses = 1 + Charisma modifier)"
+    },
+    {
+      "name": "Lay on Hands",
+      "description": "Heal wounds with a pool of hit points equal to 5 × your paladin level (recharges on long rest)"
+    }
+  ],
+  "ability_score_priority": ["Strength", "Charisma", "Constitution"],
+  "recommended_stats": {
+    "Strength": 15,
+    "Dexterity": 10,
+    "Constitution": 14,
+    "Intelligence": 8,
+    "Wisdom": 12,
+    "Charisma": 13
+  }
+}

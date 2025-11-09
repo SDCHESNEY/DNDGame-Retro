@@ -269,6 +269,157 @@ async def list_characters(player_id: int = None, db: DBSession = Depends(get_db)
     return characters
 
 
+@app.get("/api/characters/{character_id}", response_model=Character)
+async def get_character(character_id: int, db: DBSession = Depends(get_db)):
+    """Get a specific character."""
+    character = db.get(Character, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return character
+
+
+@app.put("/api/characters/{character_id}", response_model=Character)
+async def update_character(
+    character_id: int,
+    character_update: CharacterCreate,
+    db: DBSession = Depends(get_db)
+):
+    """Update a character."""
+    db_character = db.get(Character, character_id)
+    if not db_character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    
+    update_data = character_update.model_dump()
+    for key, value in update_data.items():
+        setattr(db_character, key, value)
+    
+    db.add(db_character)
+    db.commit()
+    db.refresh(db_character)
+    return db_character
+
+
+@app.delete("/api/characters/{character_id}")
+async def delete_character(character_id: int, db: DBSession = Depends(get_db)):
+    """Delete a character."""
+    character = db.get(Character, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    
+    db.delete(character)
+    db.commit()
+    return {"message": f"Character {character.name} deleted successfully"}
+
+
+@app.get("/api/characters/classes")
+async def list_character_classes():
+    """List available character classes."""
+    from .character_builder import CharacterBuilder
+    from sqlmodel import Session as DBSession
+    
+    with DBSession(engine) as db:
+        builder = CharacterBuilder(db)
+        classes = builder.list_available_classes()
+        return {"classes": classes}
+
+
+@app.post("/api/characters/from-template")
+async def create_character_from_template(
+    player_id: int,
+    name: str,
+    race: str,
+    char_class: str,
+    strength: int,
+    dexterity: int,
+    constitution: int,
+    intelligence: int,
+    wisdom: int,
+    charisma: int,
+    background: Optional[str] = None,
+    skills: Optional[list[str]] = None,
+    db: DBSession = Depends(get_db)
+):
+    """Create a character from a class template with point buy."""
+    from .character_builder import CharacterBuilder, ValidationError
+    
+    builder = CharacterBuilder(db)
+    
+    ability_scores = {
+        "strength": strength,
+        "dexterity": dexterity,
+        "constitution": constitution,
+        "intelligence": intelligence,
+        "wisdom": wisdom,
+        "charisma": charisma
+    }
+    
+    try:
+        character = builder.create_from_template(
+            player_id=player_id,
+            name=name,
+            race=race,
+            char_class=char_class,
+            ability_scores=ability_scores,
+            background=background,
+            skills=skills
+        )
+        return character
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/characters/{character_id}/summary")
+async def get_character_summary(character_id: int, db: DBSession = Depends(get_db)):
+    """Get a detailed summary of a character."""
+    from .character_builder import CharacterBuilder
+    
+    character = db.get(Character, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    
+    builder = CharacterBuilder(db)
+    summary = builder.get_character_summary(character)
+    return summary
+
+
+@app.post("/api/characters/{character_id}/validate")
+async def validate_character(character_id: int, db: DBSession = Depends(get_db)):
+    """Validate a character's stats and configuration."""
+    from .character_builder import CharacterBuilder
+    
+    character = db.get(Character, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    
+    builder = CharacterBuilder(db)
+    is_valid, errors = builder.validate_character(character)
+    
+    return {
+        "is_valid": is_valid,
+        "errors": errors
+    }
+
+
+@app.post("/api/characters/{character_id}/level-up", response_model=Character)
+async def level_up_character(character_id: int, db: DBSession = Depends(get_db)):
+    """Level up a character."""
+    from .character_builder import CharacterBuilder, ValidationError
+    
+    character = db.get(Character, character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+    
+    builder = CharacterBuilder(db)
+    
+    try:
+        character = builder.apply_level_up(character)
+        return character
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 # Message endpoints
 @app.get("/api/sessions/{session_id}/messages", response_model=list[Message])
 async def get_messages(session_id: int, limit: int = 50, db: DBSession = Depends(get_db)):

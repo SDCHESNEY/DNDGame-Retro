@@ -1,0 +1,44 @@
+{
+  "class": "Rogue",
+  "description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies",
+  "hit_die": "d8",
+  "primary_abilities": ["Dexterity"],
+  "saving_throw_proficiencies": ["Dexterity", "Intelligence"],
+  "armor_proficiencies": ["Light armor"],
+  "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+  "tool_proficiencies": ["Thieves' tools"],
+  "skill_choices": 4,
+  "skill_options": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "Sleight of Hand", "Stealth"],
+  "starting_equipment": [
+    "Rapier or shortsword",
+    "Shortbow and quiver of 20 arrows",
+    "Burglar's pack or dungeoneer's pack",
+    "Leather armor (AC 11 + Dex)",
+    "Two daggers",
+    "Thieves' tools"
+  ],
+  "starting_gold": "4d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Expertise",
+      "description": "Choose two skills or tools. Your proficiency bonus is doubled for ability checks with those skills/tools"
+    },
+    {
+      "name": "Sneak Attack",
+      "description": "Deal extra 1d6 damage when you have advantage or an ally is within 5 feet of the target (1/turn)"
+    },
+    {
+      "name": "Thieves' Cant",
+      "description": "You know the secret language and signs of rogues"
+    }
+  ],
+  "ability_score_priority": ["Dexterity", "Intelligence", "Constitution"],
+  "recommended_stats": {
+    "Strength": 10,
+    "Dexterity": 15,
+    "Constitution": 13,
+    "Intelligence": 14,
+    "Wisdom": 12,
+    "Charisma": 8
+  }
+}

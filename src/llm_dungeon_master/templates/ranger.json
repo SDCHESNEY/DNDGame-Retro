@@ -1,0 +1,37 @@
+{
+  "class": "Ranger",
+  "description": "A warrior who uses martial prowess and nature magic to combat threats on the edge of civilization",
+  "hit_die": "d10",
+  "primary_abilities": ["Dexterity", "Wisdom"],
+  "saving_throw_proficiencies": ["Strength", "Dexterity"],
+  "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+  "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+  "skill_choices": 3,
+  "skill_options": ["Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"],
+  "starting_equipment": [
+    "Scale mail or leather armor",
+    "Two shortswords or two simple melee weapons",
+    "Dungeoneer's pack or explorer's pack",
+    "Longbow and quiver of 20 arrows"
+  ],
+  "starting_gold": "5d4 × 10",
+  "level_1_features": [
+    {
+      "name": "Favored Enemy",
+      "description": "Choose a type of favored enemy: aberrations, beasts, celestials, constructs, dragons, elementals, fey, fiends, giants, monstrosities, oozes, plants, or undead. Gain advantage on tracking and recalling information about them"
+    },
+    {
+      "name": "Natural Explorer",
+      "description": "Choose a favored terrain. Gain benefits when traveling for extended periods in that terrain"
+    }
+  ],
+  "ability_score_priority": ["Dexterity", "Wisdom", "Constitution"],
+  "recommended_stats": {
+    "Strength": 12,
+    "Dexterity": 15,
+    "Constitution": 13,
+    "Intelligence": 8,
+    "Wisdom": 14,
+    "Charisma": 10
+  }
+}
