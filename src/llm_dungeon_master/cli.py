@@ -370,6 +370,238 @@ def validate_character(character_id: int = typer.Argument(..., help="Character I
             raise typer.Exit(1)
 
 
+# Multiplayer commands
+@app.command()
+def show_turns(session_id: int = typer.Argument(..., help="Session ID")):
+    """Show the current turn order and initiative."""
+    from .turn_manager import TurnManager
+    
+    with DBSession(engine) as db:
+        turn_manager = TurnManager(db)
+        turns = turn_manager.get_turn_queue(session_id)
+        
+        if not turns:
+            console.print("[yellow]No turns found. Start a turn queue first.[/yellow]")
+            return
+        
+        table = Table(title="🎲 Turn Order")
+        table.add_column("Order", style="cyan")
+        table.add_column("Character", style="green")
+        table.add_column("Initiative", style="magenta")
+        table.add_column("Round", style="blue")
+        table.add_column("Status", style="yellow")
+        
+        for turn in turns:
+            status_style = "bold green" if turn.status == "active" else "dim"
+            status_symbol = "→ " if turn.status == "active" else "  "
+            table.add_row(
+                f"{status_symbol}{turn.turn_order + 1}",
+                turn.character_name,
+                str(turn.initiative),
+                str(turn.round_number),
+                turn.status,
+                style=status_style
+            )
+        
+        console.print(table)
+
+
+@app.command()
+def start_turns(
+    session_id: int = typer.Argument(..., help="Session ID"),
+    character_ids: str = typer.Argument(..., help="Character IDs (comma-separated)")
+):
+    """Start a turn queue for a session."""
+    from .turn_manager import TurnManager
+    
+    char_ids = [int(cid.strip()) for cid in character_ids.split(",")]
+    
+    with DBSession(engine) as db:
+        turn_manager = TurnManager(db)
+        turns = turn_manager.start_turn_queue(session_id, char_ids)
+        
+        console.print(f"[green]✓ Turn queue started for session {session_id}[/green]")
+        console.print(f"  {len(turns)} characters in initiative order")
+        
+        current = turn_manager.get_current_turn(session_id)
+        if current:
+            console.print(f"  [bold]Current turn: {current.character_name}[/bold]")
+
+
+@app.command()
+def next_turn(session_id: int = typer.Argument(..., help="Session ID")):
+    """Advance to the next turn."""
+    from .turn_manager import TurnManager
+    
+    with DBSession(engine) as db:
+        turn_manager = TurnManager(db)
+        next_turn = turn_manager.advance_turn(session_id)
+        
+        console.print(Panel(
+            f"[bold green]It's now {next_turn.character_name}'s turn![/bold green]\n\n"
+            f"Round: {next_turn.round_number}\n"
+            f"Initiative: {next_turn.initiative}",
+            title="🎲 Turn Advanced",
+            border_style="green"
+        ))
+
+
+@app.command()
+def set_ready(
+    session_id: int = typer.Argument(..., help="Session ID"),
+    character_id: int = typer.Argument(..., help="Character ID"),
+    ready: bool = typer.Option(True, help="Ready status")
+):
+    """Mark a player as ready for their turn."""
+    from .turn_manager import TurnManager
+    
+    with DBSession(engine) as db:
+        turn_manager = TurnManager(db)
+        success = turn_manager.set_player_ready(session_id, character_id, ready)
+        
+        if success:
+            status = "ready" if ready else "not ready"
+            console.print(f"[green]✓ Character {character_id} marked as {status}[/green]")
+        else:
+            console.print(f"[red]Error: Could not update ready status[/red]")
+
+
+@app.command()
+def ready_check(session_id: int = typer.Argument(..., help="Session ID")):
+    """Check if all players are ready."""
+    from .turn_manager import TurnManager
+    
+    with DBSession(engine) as db:
+        turn_manager = TurnManager(db)
+        status = turn_manager.check_all_ready(session_id)
+        
+        table = Table(title="🎲 Ready Check")
+        table.add_column("Character", style="green")
+        table.add_column("Status", style="yellow")
+        
+        for player in status["players"]:
+            ready_status = "✓ Ready" if player["is_ready"] else "⏳ Waiting"
+            table.add_row(player["character_name"], ready_status)
+        
+        console.print(table)
+        
+        if status["all_ready"]:
+            console.print("[bold green]All players are ready![/bold green]")
+        else:
+            console.print(f"[yellow]{status['ready_count']}/{status['total_count']} players ready[/yellow]")
+
+
+@app.command()
+def show_presence(session_id: int = typer.Argument(..., help="Session ID")):
+    """Show player presence status."""
+    from .presence_manager import PresenceManager
+    
+    with DBSession(engine) as db:
+        presence_manager = PresenceManager(db)
+        summary = presence_manager.get_presence_summary(session_id)
+        
+        table = Table(title="👥 Player Presence")
+        table.add_column("Player", style="green")
+        table.add_column("Status", style="yellow")
+        table.add_column("Last Seen", style="blue")
+        
+        for player_info in summary["players"]:
+            status = player_info["status"]
+            status_emoji = {
+                "online": "🟢",
+                "away": "🟡",
+                "offline": "🔴"
+            }.get(status, "⚪")
+            
+            last_seen = player_info.get("last_seen")
+            last_seen_str = last_seen.strftime("%H:%M:%S") if last_seen else "Never"
+            
+            table.add_row(
+                player_info["player_name"],
+                f"{status_emoji} {status}",
+                last_seen_str
+            )
+        
+        console.print(table)
+        console.print(f"\n[dim]Online: {summary['online']} | "
+                     f"Away: {summary['away']} | "
+                     f"Offline: {summary['offline']}[/dim]")
+
+
+@app.command()
+def create_token(
+    player_id: int = typer.Argument(..., help="Player ID"),
+    session_id: int = typer.Argument(..., help="Session ID")
+):
+    """Create a reconnection token for a player."""
+    from .reconnection_manager import ReconnectionManager
+    
+    with DBSession(engine) as db:
+        reconnection_manager = ReconnectionManager(db)
+        token = reconnection_manager.create_reconnection_token(player_id, session_id)
+        
+        console.print(Panel(
+            f"[green]Reconnection token created![/green]\n\n"
+            f"[bold]Token:[/bold] {token}\n\n"
+            f"[dim]Save this token - it will only be shown once!\n"
+            f"Valid for {reconnection_manager.token_expiry_hours} hours.[/dim]",
+            title="🔑 Reconnection Token",
+            border_style="green"
+        ))
+
+
+@app.command()
+def reconnect(token: str = typer.Argument(..., help="Reconnection token")):
+    """Reconnect to a session using a token."""
+    from .reconnection_manager import ReconnectionManager
+    
+    with DBSession(engine) as db:
+        reconnection_manager = ReconnectionManager(db)
+        result = reconnection_manager.handle_reconnection(token)
+        
+        if not result.get("success"):
+            console.print(f"[red]Error: {result.get('error')}[/red]")
+            raise typer.Exit(1)
+        
+        console.print(Panel(
+            f"[green]Reconnected successfully![/green]\n\n"
+            f"Session: {result['session_name']}\n"
+            f"Player: {result['player_name']}\n"
+            f"Reconnected at: {result['reconnected_at'].strftime('%H:%M:%S')}",
+            title="🔄 Reconnection Successful",
+            border_style="green"
+        ))
+        
+        # Show session state
+        state = result.get("session_state", {})
+        if state.get("character"):
+            char = state["character"]
+            console.print(f"\n[bold]Your Character:[/bold] {char['name']} (Level {char['level']} {char['class']})")
+            console.print(f"HP: {char['current_hp']}/{char['max_hp']} | AC: {char['armor_class']}")
+        
+        if state.get("current_turn"):
+            turn = state["current_turn"]
+            console.print(f"\n[bold]Current Turn:[/bold] {turn['character_name']} (Round {turn['round_number']})")
+
+
+@app.command()
+def sync_check(session_id: int = typer.Argument(..., help="Session ID")):
+    """Check synchronization status."""
+    from .sync_manager import SyncManager
+    
+    with DBSession(engine) as db:
+        sync_manager = SyncManager(db)
+        stats = sync_manager.get_sync_stats(session_id)
+        
+        console.print(f"[bold]Synchronization Status for Session {session_id}[/bold]\n")
+        console.print(f"Active conflicts: {stats['active_conflicts']}")
+        
+        if stats['active_conflicts'] > 0:
+            console.print("\n[yellow]Conflicts by type:[/yellow]")
+            for conflict_type, count in stats['conflicts_by_type'].items():
+                console.print(f"  • {conflict_type}: {count}")
+
+
 @app.command()
 def play(
     session_id: Optional[int] = typer.Option(None, help="Session ID to join"),

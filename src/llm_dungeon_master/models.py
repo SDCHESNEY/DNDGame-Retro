@@ -272,3 +272,64 @@ class CharacterProficiency(SQLModel, table=True):
     
     # Relationships
     character: Character = Relationship(back_populates="proficiencies")
+
+
+class Turn(SQLModel, table=True):
+    """A turn in a multiplayer session."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    character_id: Optional[int] = Field(default=None, foreign_key="character.id")
+    character_name: str
+    turn_order: int  # Position in initiative order
+    initiative: int = Field(default=0)  # Initiative roll value
+    round_number: int = Field(default=1)
+    status: str = Field(default="waiting")  # waiting, active, ready, completed, skipped
+    combat_encounter_id: Optional[int] = Field(default=None, foreign_key="combatencounter.id")
+    is_npc: bool = Field(default=False)
+    started_at: Optional[datetime] = None
+    ended_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=utc_now)
+    
+    # Relationships
+    actions: list["TurnAction"] = Relationship(back_populates="turn")
+
+
+class TurnAction(SQLModel, table=True):
+    """An action taken during a turn."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    turn_id: int = Field(foreign_key="turn.id", index=True)
+    action_type: str  # action, bonus_action, reaction, movement, free_action
+    description: str
+    cost: str = Field(default="action")  # What it costs: action, bonus_action, reaction
+    timestamp: datetime = Field(default_factory=utc_now)
+    
+    # Relationships
+    turn: Turn = Relationship(back_populates="actions")
+
+
+class PlayerPresence(SQLModel, table=True):
+    """Tracks player online presence and connection status."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    player_id: int = Field(foreign_key="player.id", index=True)
+    connection_id: str  # WebSocket connection ID
+    status: str = Field(default="online")  # online, away, offline
+    last_heartbeat: datetime = Field(default_factory=utc_now)
+    connected_at: datetime = Field(default_factory=utc_now)
+    disconnected_at: Optional[datetime] = None
+
+
+class ReconnectionToken(SQLModel, table=True):
+    """Tokens for reconnecting to sessions."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    player_id: int = Field(foreign_key="player.id", index=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    token: str = Field(unique=True, index=True)
+    created_at: datetime = Field(default_factory=utc_now)
+    expires_at: datetime
+    used_at: Optional[datetime] = None
+    is_valid: bool = Field(default=True)

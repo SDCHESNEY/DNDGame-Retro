@@ -984,6 +984,304 @@ async def remove_condition(
         raise HTTPException(status_code=400, detail="Invalid condition type")
 
 
+# Multiplayer API endpoints
+from .turn_manager import TurnManager, TurnStatus
+from .presence_manager import PresenceManager, PresenceStatus
+from .sync_manager import SyncManager, ResolutionStrategy
+from .reconnection_manager import ReconnectionManager
+
+
+@app.post("/api/sessions/{session_id}/turns/start")
+async def start_turn_queue(
+    session_id: int,
+    character_ids: list[int],
+    combat_encounter_id: Optional[int] = None,
+    db: DBSession = Depends(get_db)
+):
+    """Start a turn queue for a session."""
+    turn_manager = TurnManager(db)
+    turns = turn_manager.start_turn_queue(session_id, character_ids, combat_encounter_id)
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "turn_queue_started",
+        "turns": [
+            {
+                "character_id": t.character_id,
+                "character_name": t.character_name,
+                "initiative": t.initiative,
+                "status": t.status
+            }
+            for t in turns
+        ]
+    })
+    
+    return {
+        "session_id": session_id,
+        "turns": [
+            {
+                "id": t.id,
+                "character_id": t.character_id,
+                "character_name": t.character_name,
+                "turn_order": t.turn_order,
+                "initiative": t.initiative,
+                "status": t.status
+            }
+            for t in turns
+        ]
+    }
+
+
+@app.get("/api/sessions/{session_id}/turns/current")
+async def get_current_turn(session_id: int, db: DBSession = Depends(get_db)):
+    """Get the current active turn."""
+    turn_manager = TurnManager(db)
+    turn = turn_manager.get_current_turn(session_id)
+    
+    if not turn:
+        raise HTTPException(status_code=404, detail="No active turn found")
+    
+    return {
+        "id": turn.id,
+        "character_id": turn.character_id,
+        "character_name": turn.character_name,
+        "round_number": turn.round_number,
+        "status": turn.status,
+        "started_at": turn.started_at
+    }
+
+
+@app.get("/api/sessions/{session_id}/turns")
+async def get_turn_queue(session_id: int, db: DBSession = Depends(get_db)):
+    """Get all turns in the queue."""
+    turn_manager = TurnManager(db)
+    turns = turn_manager.get_turn_queue(session_id)
+    
+    return {
+        "session_id": session_id,
+        "turns": [
+            {
+                "id": t.id,
+                "character_id": t.character_id,
+                "character_name": t.character_name,
+                "turn_order": t.turn_order,
+                "initiative": t.initiative,
+                "round_number": t.round_number,
+                "status": t.status
+            }
+            for t in turns
+        ]
+    }
+
+
+@app.post("/api/sessions/{session_id}/turns/advance")
+async def advance_turn(session_id: int, db: DBSession = Depends(get_db)):
+    """Advance to the next turn."""
+    turn_manager = TurnManager(db)
+    next_turn = turn_manager.advance_turn(session_id)
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "turn_advanced",
+        "character_id": next_turn.character_id,
+        "character_name": next_turn.character_name,
+        "round_number": next_turn.round_number
+    })
+    
+    return {
+        "character_id": next_turn.character_id,
+        "character_name": next_turn.character_name,
+        "round_number": next_turn.round_number,
+        "status": next_turn.status
+    }
+
+
+@app.post("/api/sessions/{session_id}/turns/ready")
+async def set_ready_status(
+    session_id: int,
+    character_id: int,
+    ready: bool = True,
+    db: DBSession = Depends(get_db)
+):
+    """Mark a player as ready."""
+    turn_manager = TurnManager(db)
+    success = turn_manager.set_player_ready(session_id, character_id, ready)
+    
+    if not success:
+        raise HTTPException(status_code=404, detail="Turn not found")
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "player_ready_status",
+        "character_id": character_id,
+        "ready": ready
+    })
+    
+    return {"character_id": character_id, "ready": ready}
+
+
+@app.get("/api/sessions/{session_id}/turns/ready-check")
+async def check_all_ready(session_id: int, db: DBSession = Depends(get_db)):
+    """Check if all players are ready."""
+    turn_manager = TurnManager(db)
+    return turn_manager.check_all_ready(session_id)
+
+
+@app.get("/api/sessions/{session_id}/turns/history")
+async def get_turn_history(
+    session_id: int,
+    limit: int = 50,
+    db: DBSession = Depends(get_db)
+):
+    """Get turn history."""
+    turn_manager = TurnManager(db)
+    return {"history": turn_manager.get_turn_history(session_id, limit)}
+
+
+@app.post("/api/sessions/{session_id}/presence/connect")
+async def track_presence(
+    session_id: int,
+    player_id: int,
+    connection_id: str,
+    db: DBSession = Depends(get_db)
+):
+    """Track player connection."""
+    presence_manager = PresenceManager(db)
+    presence = presence_manager.track_connection(session_id, player_id, connection_id)
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "player_connected",
+        "player_id": player_id,
+        "status": presence.status
+    })
+    
+    return {
+        "player_id": player_id,
+        "session_id": session_id,
+        "status": presence.status,
+        "connected_at": presence.connected_at
+    }
+
+
+@app.post("/api/sessions/{session_id}/presence/heartbeat")
+async def update_heartbeat(
+    session_id: int,
+    player_id: int,
+    connection_id: str,
+    db: DBSession = Depends(get_db)
+):
+    """Update player heartbeat."""
+    presence_manager = PresenceManager(db)
+    success = presence_manager.update_heartbeat(session_id, player_id, connection_id)
+    
+    if not success:
+        raise HTTPException(status_code=404, detail="Presence not found")
+    
+    return {"status": "ok"}
+
+
+@app.get("/api/sessions/{session_id}/presence")
+async def get_presence_summary(session_id: int, db: DBSession = Depends(get_db)):
+    """Get presence summary for all players."""
+    presence_manager = PresenceManager(db)
+    return presence_manager.get_presence_summary(session_id)
+
+
+@app.post("/api/sessions/{session_id}/presence/disconnect")
+async def disconnect_player(
+    session_id: int,
+    player_id: int,
+    connection_id: str,
+    db: DBSession = Depends(get_db)
+):
+    """Mark player as disconnected."""
+    presence_manager = PresenceManager(db)
+    success = presence_manager.disconnect(session_id, player_id, connection_id)
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "player_disconnected",
+        "player_id": player_id
+    })
+    
+    return {"status": "disconnected"}
+
+
+@app.post("/api/sessions/{session_id}/sync/check")
+async def check_sync(
+    session_id: int,
+    client_state: dict,
+    db: DBSession = Depends(get_db)
+):
+    """Check client state synchronization."""
+    sync_manager = SyncManager(db)
+    is_consistent, discrepancies = sync_manager.check_state_consistency(
+        session_id, client_state
+    )
+    
+    return {
+        "is_consistent": is_consistent,
+        "discrepancies": discrepancies
+    }
+
+
+@app.get("/api/sessions/{session_id}/sync/force")
+async def force_sync(session_id: int, db: DBSession = Depends(get_db)):
+    """Force synchronization with server state."""
+    sync_manager = SyncManager(db)
+    return sync_manager.force_sync(session_id)
+
+
+@app.get("/api/sessions/{session_id}/sync/stats")
+async def get_sync_stats(session_id: int, db: DBSession = Depends(get_db)):
+    """Get synchronization statistics."""
+    sync_manager = SyncManager(db)
+    return sync_manager.get_sync_stats(session_id)
+
+
+@app.post("/api/reconnection/token")
+async def create_reconnection_token(
+    player_id: int,
+    session_id: int,
+    db: DBSession = Depends(get_db)
+):
+    """Create a reconnection token."""
+    reconnection_manager = ReconnectionManager(db)
+    token = reconnection_manager.create_reconnection_token(player_id, session_id)
+    
+    return {
+        "token": token,
+        "player_id": player_id,
+        "session_id": session_id,
+        "expires_in_hours": reconnection_manager.token_expiry_hours
+    }
+
+
+@app.post("/api/reconnection/reconnect")
+async def handle_reconnection(token: str, db: DBSession = Depends(get_db)):
+    """Reconnect using a token."""
+    reconnection_manager = ReconnectionManager(db)
+    result = reconnection_manager.handle_reconnection(token)
+    
+    if not result.get("success"):
+        raise HTTPException(status_code=401, detail=result.get("error"))
+    
+    return result
+
+
+@app.get("/api/reconnection/token/{token}/info")
+async def get_token_info(token: str, db: DBSession = Depends(get_db)):
+    """Get information about a reconnection token."""
+    reconnection_manager = ReconnectionManager(db)
+    info = reconnection_manager.get_token_info(token)
+    
+    if not info:
+        raise HTTPException(status_code=404, detail="Token not found or invalid")
+    
+    return info
+
+
 # WebSocket endpoint
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: int):
