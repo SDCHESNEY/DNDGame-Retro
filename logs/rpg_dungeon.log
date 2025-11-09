@@ -1,0 +1,570 @@
+2025-11-08 23:42:38,814 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,824 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:38,824 - sqlalchemy.engine.Engine - INFO - [generated in 0.00014s] (1, 0)
+2025-11-08 23:42:38,828 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,830 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,831 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,831 - sqlalchemy.engine.Engine - INFO - [generated in 0.00010s] ('Test Adventure', 'Test DM', '2025-11-09 04:42:38.830624', 1)
+2025-11-08 23:42:38,832 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,833 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,833 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,833 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] (31,)
+2025-11-08 23:42:38,834 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,835 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,835 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,836 - sqlalchemy.engine.Engine - INFO - [cached since 0.004195s ago] ('Session 1', 'DM 1', '2025-11-09 04:42:38.835737', 1)
+2025-11-08 23:42:38,836 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,840 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,840 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,840 - sqlalchemy.engine.Engine - INFO - [cached since 0.006337s ago] (32,)
+2025-11-08 23:42:38,840 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,841 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,841 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session
+2025-11-08 23:42:38,841 - sqlalchemy.engine.Engine - INFO - [generated in 0.00006s] ()
+2025-11-08 23:42:38,842 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,843 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,843 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,843 - sqlalchemy.engine.Engine - INFO - [cached since 0.01212s ago] ('Specific Session', 'Specific DM', '2025-11-09 04:42:38.843672', 1)
+2025-11-08 23:42:38,844 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,844 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,844 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,844 - sqlalchemy.engine.Engine - INFO - [cached since 0.011s ago] (33,)
+2025-11-08 23:42:38,845 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,846 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,846 - sqlalchemy.engine.Engine - INFO - SELECT session.id AS session_id, session.name AS session_name, session.dm_name AS session_dm_name, session.created_at AS session_created_at, session.is_active AS session_is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,846 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] (33,)
+2025-11-08 23:42:38,846 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,848 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,848 - sqlalchemy.engine.Engine - INFO - SELECT session.id AS session_id, session.name AS session_name, session.dm_name AS session_dm_name, session.created_at AS session_created_at, session.is_active AS session_is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,848 - sqlalchemy.engine.Engine - INFO - [cached since 0.001802s ago] (99999,)
+2025-11-08 23:42:38,848 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,849 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,850 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,850 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] ('Test Player', '2025-11-09 04:42:38.849802')
+2025-11-08 23:42:38,850 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,853 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,853 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,853 - sqlalchemy.engine.Engine - INFO - [generated in 0.00006s] (20,)
+2025-11-08 23:42:38,854 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,855 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,855 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,855 - sqlalchemy.engine.Engine - INFO - [cached since 0.005558s ago] ('Player 1', '2025-11-09 04:42:38.855580')
+2025-11-08 23:42:38,856 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,856 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,856 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,856 - sqlalchemy.engine.Engine - INFO - [cached since 0.002722s ago] (21,)
+2025-11-08 23:42:38,856 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,857 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,857 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player
+2025-11-08 23:42:38,857 - sqlalchemy.engine.Engine - INFO - [generated in 0.00005s] ()
+2025-11-08 23:42:38,858 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,859 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,859 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,859 - sqlalchemy.engine.Engine - INFO - [cached since 0.009613s ago] ('Test Player', '2025-11-09 04:42:38.859605')
+2025-11-08 23:42:38,860 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,860 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,860 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,860 - sqlalchemy.engine.Engine - INFO - [cached since 0.006836s ago] (22,)
+2025-11-08 23:42:38,860 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,862 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,863 - sqlalchemy.engine.Engine - INFO - INSERT INTO character (player_id, name, race, char_class, level, background, strength, dexterity, constitution, intelligence, wisdom, charisma, max_hp, current_hp, armor_class, initiative_bonus, speed, experience_points, proficiency_bonus, death_save_successes, death_save_failures, spell_slots_1, spell_slots_2, spell_slots_3, spell_slots_4, spell_slots_5, spell_slots_6, spell_slots_7, spell_slots_8, spell_slots_9, current_spell_slots_1, current_spell_slots_2, current_spell_slots_3, current_spell_slots_4, current_spell_slots_5, current_spell_slots_6, current_spell_slots_7, current_spell_slots_8, current_spell_slots_9, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-11-08 23:42:38,863 - sqlalchemy.engine.Engine - INFO - [generated in 0.00013s] (22, 'Test Character', 'Elf', 'Ranger', 1, None, 12, 16, 14, 10, 14, 10, 10, 10, 10, 0, 30, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-11-09 04:42:38.861941')
+2025-11-08 23:42:38,863 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,864 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,864 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character 
+WHERE character.id = ?
+2025-11-08 23:42:38,864 - sqlalchemy.engine.Engine - INFO - [generated in 0.00006s] (14,)
+2025-11-08 23:42:38,865 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,866 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,866 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,866 - sqlalchemy.engine.Engine - INFO - [cached since 0.01655s ago] ('Test Player', '2025-11-09 04:42:38.866567')
+2025-11-08 23:42:38,867 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,867 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,867 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,867 - sqlalchemy.engine.Engine - INFO - [cached since 0.01375s ago] (23,)
+2025-11-08 23:42:38,867 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,868 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - INSERT INTO character (player_id, name, race, char_class, level, background, strength, dexterity, constitution, intelligence, wisdom, charisma, max_hp, current_hp, armor_class, initiative_bonus, speed, experience_points, proficiency_bonus, death_save_successes, death_save_failures, spell_slots_1, spell_slots_2, spell_slots_3, spell_slots_4, spell_slots_5, spell_slots_6, spell_slots_7, spell_slots_8, spell_slots_9, current_spell_slots_1, current_spell_slots_2, current_spell_slots_3, current_spell_slots_4, current_spell_slots_5, current_spell_slots_6, current_spell_slots_7, current_spell_slots_8, current_spell_slots_9, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - [cached since 0.006122s ago] (23, 'Character 1', 'Human', 'Fighter', 1, None, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 30, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-11-09 04:42:38.868706')
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character 
+WHERE character.id = ?
+2025-11-08 23:42:38,869 - sqlalchemy.engine.Engine - INFO - [cached since 0.005271s ago] (15,)
+2025-11-08 23:42:38,870 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,871 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,871 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character
+2025-11-08 23:42:38,871 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] ()
+2025-11-08 23:42:38,871 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,873 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,873 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,873 - sqlalchemy.engine.Engine - INFO - [cached since 0.02316s ago] ('Player 1', '2025-11-09 04:42:38.873205')
+2025-11-08 23:42:38,873 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,874 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,874 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,874 - sqlalchemy.engine.Engine - INFO - [cached since 0.02033s ago] (24,)
+2025-11-08 23:42:38,874 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,875 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,875 - sqlalchemy.engine.Engine - INFO - INSERT INTO player (name, created_at) VALUES (?, ?)
+2025-11-08 23:42:38,875 - sqlalchemy.engine.Engine - INFO - [cached since 0.0253s ago] ('Player 2', '2025-11-09 04:42:38.875297')
+2025-11-08 23:42:38,875 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,876 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,876 - sqlalchemy.engine.Engine - INFO - SELECT player.id, player.name, player.created_at 
+FROM player 
+WHERE player.id = ?
+2025-11-08 23:42:38,876 - sqlalchemy.engine.Engine - INFO - [cached since 0.02249s ago] (25,)
+2025-11-08 23:42:38,876 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,877 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,877 - sqlalchemy.engine.Engine - INFO - INSERT INTO character (player_id, name, race, char_class, level, background, strength, dexterity, constitution, intelligence, wisdom, charisma, max_hp, current_hp, armor_class, initiative_bonus, speed, experience_points, proficiency_bonus, death_save_successes, death_save_failures, spell_slots_1, spell_slots_2, spell_slots_3, spell_slots_4, spell_slots_5, spell_slots_6, spell_slots_7, spell_slots_8, spell_slots_9, current_spell_slots_1, current_spell_slots_2, current_spell_slots_3, current_spell_slots_4, current_spell_slots_5, current_spell_slots_6, current_spell_slots_7, current_spell_slots_8, current_spell_slots_9, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-11-08 23:42:38,877 - sqlalchemy.engine.Engine - INFO - [cached since 0.01486s ago] (24, 'Char 1', 'Human', 'Fighter', 1, None, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 30, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-11-09 04:42:38.877493')
+2025-11-08 23:42:38,878 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,878 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,878 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character 
+WHERE character.id = ?
+2025-11-08 23:42:38,878 - sqlalchemy.engine.Engine - INFO - [cached since 0.01402s ago] (16,)
+2025-11-08 23:42:38,878 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,879 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - INSERT INTO character (player_id, name, race, char_class, level, background, strength, dexterity, constitution, intelligence, wisdom, charisma, max_hp, current_hp, armor_class, initiative_bonus, speed, experience_points, proficiency_bonus, death_save_successes, death_save_failures, spell_slots_1, spell_slots_2, spell_slots_3, spell_slots_4, spell_slots_5, spell_slots_6, spell_slots_7, spell_slots_8, spell_slots_9, current_spell_slots_1, current_spell_slots_2, current_spell_slots_3, current_spell_slots_4, current_spell_slots_5, current_spell_slots_6, current_spell_slots_7, current_spell_slots_8, current_spell_slots_9, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - [cached since 0.01712s ago] (25, 'Char 2', 'Elf', 'Wizard', 1, None, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 30, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2025-11-09 04:42:38.879804')
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character 
+WHERE character.id = ?
+2025-11-08 23:42:38,880 - sqlalchemy.engine.Engine - INFO - [cached since 0.01636s ago] (17,)
+2025-11-08 23:42:38,881 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,882 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,882 - sqlalchemy.engine.Engine - INFO - SELECT character.id, character.player_id, character.name, character.race, character.char_class, character.level, character.background, character.strength, character.dexterity, character.constitution, character.intelligence, character.wisdom, character.charisma, character.max_hp, character.current_hp, character.armor_class, character.initiative_bonus, character.speed, character.experience_points, character.proficiency_bonus, character.death_save_successes, character.death_save_failures, character.spell_slots_1, character.spell_slots_2, character.spell_slots_3, character.spell_slots_4, character.spell_slots_5, character.spell_slots_6, character.spell_slots_7, character.spell_slots_8, character.spell_slots_9, character.current_spell_slots_1, character.current_spell_slots_2, character.current_spell_slots_3, character.current_spell_slots_4, character.current_spell_slots_5, character.current_spell_slots_6, character.current_spell_slots_7, character.current_spell_slots_8, character.current_spell_slots_9, character.created_at 
+FROM character 
+WHERE character.player_id = ?
+2025-11-08 23:42:38,882 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] (24,)
+2025-11-08 23:42:38,883 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,884 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,884 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,884 - sqlalchemy.engine.Engine - INFO - [cached since 0.05292s ago] ('Test Session', 'Test DM', '2025-11-09 04:42:38.884508', 1)
+2025-11-08 23:42:38,885 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,885 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,885 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,885 - sqlalchemy.engine.Engine - INFO - [cached since 0.05174s ago] (34,)
+2025-11-08 23:42:38,885 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,886 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,887 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:38,887 - sqlalchemy.engine.Engine - INFO - [generated in 0.00006s] (34, 50, 0)
+2025-11-08 23:42:38,887 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,888 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,888 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,888 - sqlalchemy.engine.Engine - INFO - [cached since 0.05713s ago] ('Test Session', 'Test DM', '2025-11-09 04:42:38.888754', 1)
+2025-11-08 23:42:38,889 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,889 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,889 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,889 - sqlalchemy.engine.Engine - INFO - [cached since 0.05585s ago] (35,)
+2025-11-08 23:42:38,889 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,890 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,891 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:38,891 - sqlalchemy.engine.Engine - INFO - [generated in 0.00007s] (35, 'Test Player', 'I want to explore the dungeon', 'player', '2025-11-09 04:42:38.890806')
+2025-11-08 23:42:38,891 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,892 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,892 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.id = ?
+2025-11-08 23:42:38,892 - sqlalchemy.engine.Engine - INFO - [generated in 0.00006s] (142,)
+2025-11-08 23:42:38,892 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,894 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,894 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,894 - sqlalchemy.engine.Engine - INFO - [cached since 0.06255s ago] ('Test Session', 'Test DM', '2025-11-09 04:42:38.894168', 1)
+2025-11-08 23:42:38,894 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,895 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,895 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,895 - sqlalchemy.engine.Engine - INFO - [cached since 0.06134s ago] (36,)
+2025-11-08 23:42:38,895 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,896 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,896 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:38,896 - sqlalchemy.engine.Engine - INFO - [cached since 0.00533s ago] (36, 'Sender-player', 'Test player message', 'player', '2025-11-09 04:42:38.896282')
+2025-11-08 23:42:38,896 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,897 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,897 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.id = ?
+2025-11-08 23:42:38,897 - sqlalchemy.engine.Engine - INFO - [cached since 0.004547s ago] (143,)
+2025-11-08 23:42:38,897 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,898 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,898 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:38,898 - sqlalchemy.engine.Engine - INFO - [cached since 0.007234s ago] (36, 'Sender-dm', 'Test dm message', 'dm', '2025-11-09 04:42:38.898204')
+2025-11-08 23:42:38,898 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,899 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,899 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.id = ?
+2025-11-08 23:42:38,899 - sqlalchemy.engine.Engine - INFO - [cached since 0.006538s ago] (144,)
+2025-11-08 23:42:38,899 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,900 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,900 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:38,900 - sqlalchemy.engine.Engine - INFO - [cached since 0.009368s ago] (36, 'Sender-system', 'Test system message', 'system', '2025-11-09 04:42:38.900287')
+2025-11-08 23:42:38,900 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,901 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,901 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.id = ?
+2025-11-08 23:42:38,901 - sqlalchemy.engine.Engine - INFO - [cached since 0.008676s ago] (145,)
+2025-11-08 23:42:38,917 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,918 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,918 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:38,918 - sqlalchemy.engine.Engine - INFO - [cached since 0.03137s ago] (36, 50, 0)
+2025-11-08 23:42:38,918 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:38,920 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,920 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:38,920 - sqlalchemy.engine.Engine - INFO - [cached since 0.08852s ago] ('DM Test Session', 'Test DM', '2025-11-09 04:42:38.920163', 1)
+2025-11-08 23:42:38,920 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:38,921 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:38,921 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:38,921 - sqlalchemy.engine.Engine - INFO - [cached since 0.08739s ago] (37,)
+2025-11-08 23:42:38,921 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:40,561 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:40,562 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:40,562 - sqlalchemy.engine.Engine - INFO - [cached since 1.671s ago] (37, 'Dungeon Master', 'Welcome to the adventure!\n\nYou find yourselves in the bustling tavern known as The Prancing Pony. The flickering glow of lanterns casts a warm, inv ... (73 characters truncated) ... stew and freshly baked bread. Adventurers of all sorts gather here, sharing tales of dungeons delved and dragons slain.\n\nWhat would you like to do?', 'dm', '2025-11-09 04:42:40.560946')
+2025-11-08 23:42:40,563 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:40,570 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:40,570 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:40,570 - sqlalchemy.engine.Engine - INFO - [cached since 1.739s ago] ('Action Test Session', 'Test DM', '2025-11-09 04:42:40.570224', 1)
+2025-11-08 23:42:40,571 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:40,572 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:40,572 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:40,572 - sqlalchemy.engine.Engine - INFO - [cached since 1.739s ago] (38,)
+2025-11-08 23:42:40,573 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:40,575 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:40,575 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:40,575 - sqlalchemy.engine.Engine - INFO - [cached since 1.685s ago] (38, 'TestPlayer', 'I look around the room', 'player', '2025-11-09 04:42:40.575567')
+2025-11-08 23:42:40,576 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:40,577 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:40,577 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:40,577 - sqlalchemy.engine.Engine - INFO - [cached since 1.691s ago] (38, 20, 0)
+2025-11-08 23:42:43,007 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:43,007 - sqlalchemy.engine.Engine - INFO - [cached since 4.116s ago] (38, 'Dungeon Master', 'The room you find yourself in is dimly lit, with dusty rays of sunlight filtering through a cracked, stained-glass window. The air is filled with the ... (190 characters truncated) ... le, cluttered with alchemical equipment and an open, leather-bound book, its pages filled with cryptic symbols. 🕯️\n\nWhat would you like to do next?', 'dm', '2025-11-09 04:42:43.006858')
+2025-11-08 23:42:43,007 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:43,012 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,012 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:43,012 - sqlalchemy.engine.Engine - INFO - [cached since 4.181s ago] ('Token Test Session', 'Test DM', '2025-11-09 04:42:43.012081', 1)
+2025-11-08 23:42:43,012 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:43,013 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,013 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:43,014 - sqlalchemy.engine.Engine - INFO - [cached since 4.18s ago] (39,)
+2025-11-08 23:42:43,014 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:43,017 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,018 - sqlalchemy.engine.Engine - INFO - INSERT INTO session (name, dm_name, created_at, is_active) VALUES (?, ?, ?, ?)
+2025-11-08 23:42:43,018 - sqlalchemy.engine.Engine - INFO - [cached since 4.186s ago] ('Rate Limit Test', 'Test DM', '2025-11-09 04:42:43.017726', 1)
+2025-11-08 23:42:43,018 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:43,019 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,019 - sqlalchemy.engine.Engine - INFO - SELECT session.id, session.name, session.dm_name, session.created_at, session.is_active 
+FROM session 
+WHERE session.id = ?
+2025-11-08 23:42:43,019 - sqlalchemy.engine.Engine - INFO - [cached since 4.186s ago] (40,)
+2025-11-08 23:42:43,019 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-11-08 23:42:43,021 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,022 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:43,022 - sqlalchemy.engine.Engine - INFO - [cached since 4.131s ago] (40, 'SpamPlayer', 'Action 0', 'player', '2025-11-09 04:42:43.021268')
+2025-11-08 23:42:43,022 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:43,023 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:43,023 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:43,024 - sqlalchemy.engine.Engine - INFO - [cached since 4.137s ago] (40, 20, 0)
+2025-11-08 23:42:45,262 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:45,262 - sqlalchemy.engine.Engine - INFO - [cached since 6.371s ago] (40, 'Dungeon Master', 'As the brave adventurers stand at the mouth of the foreboding cave, a chill wind seems to whisper promises of danger and treasure within. The stalact ... (100 characters truncated) ... ily. Shadows dance along the walls, hinting at unseen movements deeper inside. 🕯️\n\nThe party has yet to make their move. What would you like to do?', 'dm', '2025-11-09 04:42:45.261192')
+2025-11-08 23:42:45,263 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:45,269 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:45,269 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:45,269 - sqlalchemy.engine.Engine - INFO - [cached since 6.379s ago] (40, 'SpamPlayer', 'Action 1', 'player', '2025-11-09 04:42:45.269029')
+2025-11-08 23:42:45,270 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:45,271 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:45,271 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:45,271 - sqlalchemy.engine.Engine - INFO - [cached since 6.385s ago] (40, 20, 0)
+2025-11-08 23:42:47,363 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:47,363 - sqlalchemy.engine.Engine - INFO - [cached since 8.473s ago] (40, 'Dungeon Master', 'Dungeon Master: The adventurers remain poised at the cave entrance, the tension palpable as they contemplate their next move. The air is thick with a ... (31 characters truncated) ... em to stretch ever closer, as if inviting the heroes to step into the unknown.\n\nWhat actions will the party take as they prepare to enter the cave?', 'dm', '2025-11-09 04:42:47.362310')
+2025-11-08 23:42:47,365 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:47,371 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:47,372 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:47,372 - sqlalchemy.engine.Engine - INFO - [cached since 8.481s ago] (40, 'SpamPlayer', 'Action 2', 'player', '2025-11-09 04:42:47.371345')
+2025-11-08 23:42:47,372 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:47,374 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:47,374 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:47,374 - sqlalchemy.engine.Engine - INFO - [cached since 8.488s ago] (40, 20, 0)
+2025-11-08 23:42:49,844 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:49,845 - sqlalchemy.engine.Engine - INFO - [cached since 10.95s ago] (40, 'Dungeon Master', 'Dungeon Master: The party stands resolute, their silhouettes framed against the dim light filtering in from the outside world. The cave seems to exha ... (145 characters truncated) ... the party to decide how they wish to proceed. Would you like to enter cautiously, scout ahead, or perhaps make camp before delving into the darkness?', 'dm', '2025-11-09 04:42:49.843626')
+2025-11-08 23:42:49,846 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:49,852 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:49,852 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:49,852 - sqlalchemy.engine.Engine - INFO - [cached since 10.96s ago] (40, 'SpamPlayer', 'Action 3', 'player', '2025-11-09 04:42:49.852169')
+2025-11-08 23:42:49,853 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:49,854 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:49,854 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:49,855 - sqlalchemy.engine.Engine - INFO - [cached since 10.97s ago] (40, 20, 0)
+2025-11-08 23:42:51,816 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:51,816 - sqlalchemy.engine.Engine - INFO - [cached since 12.93s ago] (40, 'Dungeon Master', "Dungeon Master: The cave entrance looms before the adventurers, its darkness a silent challenge. The adventurers remain at the threshold, where the r ... (120 characters truncated) ... ow will your party proceed from here? Will you light a torch and step inside, or perhaps consult any maps or spells to gain insight before advancing?", 'dm', '2025-11-09 04:42:51.815618')
+2025-11-08 23:42:51,818 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:51,824 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:51,824 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:51,824 - sqlalchemy.engine.Engine - INFO - [cached since 12.93s ago] (40, 'SpamPlayer', 'Action 4', 'player', '2025-11-09 04:42:51.824041')
+2025-11-08 23:42:51,825 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:51,826 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:51,827 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:51,827 - sqlalchemy.engine.Engine - INFO - [cached since 12.94s ago] (40, 20, 0)
+2025-11-08 23:42:54,171 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:54,171 - sqlalchemy.engine.Engine - INFO - [cached since 15.28s ago] (40, 'Dungeon Master', "Dungeon Master: The cavern's entrance remains an imposing presence, yet the brave adventurers stand firm in their resolve to uncover its secrets. The ... (187 characters truncated) ... erfect moment to decide your course of action. Will you move forward together, send a scout ahead, or prepare in some other way? The choice is yours.", 'dm', '2025-11-09 04:42:54.170305')
+2025-11-08 23:42:54,173 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:54,179 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:54,180 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:54,180 - sqlalchemy.engine.Engine - INFO - [cached since 15.29s ago] (40, 'SpamPlayer', 'Action 5', 'player', '2025-11-09 04:42:54.179427')
+2025-11-08 23:42:54,180 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:54,182 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:54,182 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:54,182 - sqlalchemy.engine.Engine - INFO - [cached since 15.3s ago] (40, 20, 0)
+2025-11-08 23:42:56,424 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:56,424 - sqlalchemy.engine.Engine - INFO - [cached since 17.53s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: The adventurers hold their ground, the moment suspended in time as the cave's mysterious allure beckons them forward. ... (186 characters truncated) ...  will you do next? Step boldly into the cave, cast a spell to illuminate the path, or perhaps pause to strategize? The adventure awaits your command.", 'dm', '2025-11-09 04:42:56.422972')
+2025-11-08 23:42:56,425 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:56,431 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:56,431 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:56,431 - sqlalchemy.engine.Engine - INFO - [cached since 17.54s ago] (40, 'SpamPlayer', 'Action 6', 'player', '2025-11-09 04:42:56.431093')
+2025-11-08 23:42:56,432 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:56,434 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:56,434 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:56,434 - sqlalchemy.engine.Engine - INFO - [cached since 17.55s ago] (40, 20, 0)
+2025-11-08 23:42:58,411 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:58,412 - sqlalchemy.engine.Engine - INFO - [cached since 19.52s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: The scene remains unchanged as the adventurers linger at the cave entrance, the world seemingly holding its breath in ... (163 characters truncated) ... s the mystery of the cave before you? Perhaps a bold march forward, a cautious examination, or a magical inquiry to aid your path? The choice awaits!", 'dm', '2025-11-09 04:42:58.410768')
+2025-11-08 23:42:58,413 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:58,418 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:58,419 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:42:58,419 - sqlalchemy.engine.Engine - INFO - [cached since 19.53s ago] (40, 'SpamPlayer', 'Action 7', 'player', '2025-11-09 04:42:58.418660')
+2025-11-08 23:42:58,419 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:42:58,421 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:42:58,421 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:42:58,421 - sqlalchemy.engine.Engine - INFO - [cached since 19.53s ago] (40, 20, 0)
+2025-11-08 23:43:01,134 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:01,135 - sqlalchemy.engine.Engine - INFO - [cached since 22.24s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: The adventurers continue to stand at the precipice of their next great adventure, the cave entrance as silent and imp ... (195 characters truncated) ...  party forward? Will you explore with stealth, seek guidance from a deity, or perhaps call upon a companion's expertise? The path is yours to choose!", 'dm', '2025-11-09 04:43:01.133877')
+2025-11-08 23:43:01,136 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:01,142 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:01,143 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:01,143 - sqlalchemy.engine.Engine - INFO - [cached since 22.25s ago] (40, 'SpamPlayer', 'Action 8', 'player', '2025-11-09 04:43:01.142445')
+2025-11-08 23:43:01,143 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:01,145 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:01,145 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:01,145 - sqlalchemy.engine.Engine - INFO - [cached since 22.26s ago] (40, 20, 0)
+2025-11-08 23:43:03,486 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:03,486 - sqlalchemy.engine.Engine - INFO - [cached since 24.6s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: The scene remains charged with the promise of adventure, the cave's dark maw waiting patiently for the adventurers to ... (189 characters truncated) ...  you enter the cave with weapons drawn, consult a map for guidance, or perhaps use a spell to reveal hidden dangers? The adventure is yours to shape!", 'dm', '2025-11-09 04:43:03.485846')
+2025-11-08 23:43:03,487 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:03,490 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:03,490 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:03,491 - sqlalchemy.engine.Engine - INFO - [cached since 24.6s ago] (40, 'SpamPlayer', 'Action 9', 'player', '2025-11-09 04:43:03.490608')
+2025-11-08 23:43:03,491 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:03,492 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:03,492 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:03,492 - sqlalchemy.engine.Engine - INFO - [cached since 24.61s ago] (40, 20, 0)
+2025-11-08 23:43:06,869 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:06,869 - sqlalchemy.engine.Engine - INFO - [cached since 27.98s ago] (40, 'Dungeon Master', "I'm here to help guide your adventure, but it seems like we're caught in a loop at the cave entrance. Let's break free and dive into the adventure! P ... (16 characters truncated) ... y something different, like casting a spell, investigating the surroundings, or even just stepping inside the cave. What would you like to do next? 🌟", 'dm', '2025-11-09 04:43:06.868187')
+2025-11-08 23:43:06,871 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:06,876 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:06,876 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:06,877 - sqlalchemy.engine.Engine - INFO - [cached since 27.99s ago] (40, 'SpamPlayer', 'Action 10', 'player', '2025-11-09 04:43:06.876351')
+2025-11-08 23:43:06,877 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:06,879 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:06,879 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:06,879 - sqlalchemy.engine.Engine - INFO - [cached since 27.99s ago] (40, 20, 0)
+2025-11-08 23:43:09,172 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:09,173 - sqlalchemy.engine.Engine - INFO - [cached since 30.28s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: Determined to break the cycle of indecision, the adventurers finally muster the courage to act. The choice looms befo ... (141 characters truncated) ... th a torch held high, send a scout to sneak ahead silently, or perhaps consult a tome of ancient lore for insight? The adventure awaits your command!", 'dm', '2025-11-09 04:43:09.171803')
+2025-11-08 23:43:09,174 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:09,180 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:09,181 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:09,181 - sqlalchemy.engine.Engine - INFO - [cached since 30.29s ago] (40, 'SpamPlayer', 'Action 11', 'player', '2025-11-09 04:43:09.180354')
+2025-11-08 23:43:09,182 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:09,183 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:09,184 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:09,184 - sqlalchemy.engine.Engine - INFO - [cached since 30.3s ago] (40, 20, 0)
+2025-11-08 23:43:11,784 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:11,784 - sqlalchemy.engine.Engine - INFO - [cached since 32.89s ago] (40, 'Dungeon Master', "Dungeon Master: It seems like we're in a bit of a loop here! Let's try to move the story forward. Maybe your adventurers could light a torch and vent ... (13 characters truncated) ... cave, or perhaps you could roll for perception to see if there are any clues or dangers nearby. What would you like to do to advance the adventure? 🌟", 'dm', '2025-11-09 04:43:11.783567')
+2025-11-08 23:43:11,786 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:11,792 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:11,793 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:11,793 - sqlalchemy.engine.Engine - INFO - [cached since 32.9s ago] (40, 'SpamPlayer', 'Action 12', 'player', '2025-11-09 04:43:11.792595')
+2025-11-08 23:43:11,794 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:11,795 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:11,795 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:11,795 - sqlalchemy.engine.Engine - INFO - [cached since 32.91s ago] (40, 20, 0)
+2025-11-08 23:43:13,706 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:13,707 - sqlalchemy.engine.Engine - INFO - [cached since 34.82s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: It seems like we're experiencing a bit of repetition here. Let's take a different approach to move the story forward. ... (48 characters truncated) ... ings for clues, or you might want to attempt a skill check to gain new insights. What action would you like to take next to progress the adventure? 🌟", 'dm', '2025-11-09 04:43:13.705745')
+2025-11-08 23:43:13,708 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:13,713 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:13,713 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:13,713 - sqlalchemy.engine.Engine - INFO - [cached since 34.82s ago] (40, 'SpamPlayer', 'Action 13', 'player', '2025-11-09 04:43:13.713234')
+2025-11-08 23:43:13,714 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:13,715 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:13,715 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:13,715 - sqlalchemy.engine.Engine - INFO - [cached since 34.83s ago] (40, 20, 0)
+2025-11-08 23:43:15,573 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:15,573 - sqlalchemy.engine.Engine - INFO - [cached since 36.68s ago] (40, 'Dungeon Master', "I'm here to make your adventure exciting and dynamic, but it seems like we're in a repetitive loop. Let's shake things up! Here are a few options you ... (114 characters truncated) ... ormation about your surroundings.\n3. Use a spell to reveal hidden dangers or illuminate the path ahead.\n\nWhich direction would you like to take? 🌟", 'dm', '2025-11-09 04:43:15.572001')
+2025-11-08 23:43:15,574 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:15,580 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:15,580 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:15,580 - sqlalchemy.engine.Engine - INFO - [cached since 36.69s ago] (40, 'SpamPlayer', 'Action 14', 'player', '2025-11-09 04:43:15.580294')
+2025-11-08 23:43:15,581 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:15,582 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:15,583 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:15,583 - sqlalchemy.engine.Engine - INFO - [cached since 36.7s ago] (40, 20, 0)
+2025-11-08 23:43:17,313 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:17,313 - sqlalchemy.engine.Engine - INFO - [cached since 38.42s ago] (40, 'Dungeon Master', "Dungeon Master: It seems like we're stuck in a bit of a loop. Let's break free and dive into the adventure with a fresh approach! How about rolling a ... (25 characters truncated) ... n from the options I suggested, like lighting a torch or casting a spell? Let me know what you'd like to do, and we'll get the story moving again! 🎲✨", 'dm', '2025-11-09 04:43:17.312251')
+2025-11-08 23:43:17,314 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:17,319 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:17,319 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:17,319 - sqlalchemy.engine.Engine - INFO - [cached since 38.43s ago] (40, 'SpamPlayer', 'Action 15', 'player', '2025-11-09 04:43:17.319311')
+2025-11-08 23:43:17,320 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:17,321 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:17,321 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:17,322 - sqlalchemy.engine.Engine - INFO - [cached since 38.43s ago] (40, 20, 0)
+2025-11-08 23:43:19,767 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:19,768 - sqlalchemy.engine.Engine - INFO - [cached since 40.88s ago] (40, 'Dungeon Master', "Dungeon Master: Let's revitalize the adventure with a new course of action! Perhaps your party could:\n\n1. Roll for initiative and prepare for any p ... (104 characters truncated) ... eck for traps or hidden passages.\n\nChoose one of these or propose a new idea to help us break free from the loop and continue your epic journey! 🌟✨", 'dm', '2025-11-09 04:43:19.767631')
+2025-11-08 23:43:19,769 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:19,773 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:19,773 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:19,773 - sqlalchemy.engine.Engine - INFO - [cached since 40.88s ago] (40, 'SpamPlayer', 'Action 16', 'player', '2025-11-09 04:43:19.773181')
+2025-11-08 23:43:19,774 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:19,775 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:19,775 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:19,775 - sqlalchemy.engine.Engine - INFO - [cached since 40.89s ago] (40, 20, 0)
+2025-11-08 23:43:21,712 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:21,712 - sqlalchemy.engine.Engine - INFO - [cached since 42.82s ago] (40, 'Dungeon Master', "Dungeon Master: It seems we're caught in a loop, but don't worry—adventuring is all about making choices and moving forward! Let's try something diff ... (129 characters truncated) ... r maybe you could consult an NPC in your party for their thoughts? Let me know how you'd like to proceed, and we'll continue this grand adventure! 🎲✨", 'dm', '2025-11-09 04:43:21.712274')
+2025-11-08 23:43:21,713 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:21,715 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:21,715 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:21,715 - sqlalchemy.engine.Engine - INFO - [cached since 42.82s ago] (40, 'SpamPlayer', 'Action 17', 'player', '2025-11-09 04:43:21.715385')
+2025-11-08 23:43:21,715 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:21,716 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:21,716 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:21,716 - sqlalchemy.engine.Engine - INFO - [cached since 42.83s ago] (40, 20, 0)
+2025-11-08 23:43:24,479 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:24,479 - sqlalchemy.engine.Engine - INFO - [cached since 45.59s ago] (40, 'Dungeon Master', 'Dungeon Master: Dungeon Master: It appears we’re in a repeating cycle, but I’m eager to help you break through it and continue your adventure! Here’s ... (300 characters truncated) ... e.\n3. Discuss with your party which skills or spells might best serve you in this situation.\n\nChoose your path, and let the adventure continue! 🌟✨', 'dm', '2025-11-09 04:43:24.478794')
+2025-11-08 23:43:24,480 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:24,483 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:24,484 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:24,484 - sqlalchemy.engine.Engine - INFO - [cached since 45.59s ago] (40, 'SpamPlayer', 'Action 18', 'player', '2025-11-09 04:43:24.483712')
+2025-11-08 23:43:24,484 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:24,485 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:24,485 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:24,485 - sqlalchemy.engine.Engine - INFO - [cached since 45.6s ago] (40, 20, 0)
+2025-11-08 23:43:26,835 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:26,836 - sqlalchemy.engine.Engine - INFO - [cached since 47.95s ago] (40, 'Dungeon Master', "Dungeon Master: Dungeon Master: Dungeon Master: It seems we're still tangled in a loop, but let's push forward and bring some excitement back to the  ... (302 characters truncated) ... e darkness.\n3. Roll for a Nature check to understand the source of the tremor.\n\nLet's choose a path and dive into the depths of this adventure! 🌌✨", 'dm', '2025-11-09 04:43:26.834852')
+2025-11-08 23:43:26,837 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:26,842 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:26,842 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:26,842 - sqlalchemy.engine.Engine - INFO - [cached since 47.95s ago] (40, 'SpamPlayer', 'Action 19', 'player', '2025-11-09 04:43:26.842112')
+2025-11-08 23:43:26,843 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-11-08 23:43:26,844 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-11-08 23:43:26,844 - sqlalchemy.engine.Engine - INFO - SELECT message.id, message.session_id, message.sender_name, message.content, message.message_type, message.created_at 
+FROM message 
+WHERE message.session_id = ? ORDER BY message.created_at DESC
+ LIMIT ? OFFSET ?
+2025-11-08 23:43:26,844 - sqlalchemy.engine.Engine - INFO - [cached since 47.96s ago] (40, 20, 0)
+2025-11-08 23:43:29,101 - sqlalchemy.engine.Engine - INFO - INSERT INTO message (session_id, sender_name, content, message_type, created_at) VALUES (?, ?, ?, ?, ?)
+2025-11-08 23:43:29,101 - sqlalchemy.engine.Engine - INFO - [cached since 50.21s ago] (40, 'Dungeon Master', "I'm here to guide your adventure and keep it exciting, but it seems we're encountering a bit of a repetitive loop. Let’s shake things up with a fresh ... (326 characters truncated) ... History check to recall tales of this mysterious cave.\n\nChoose one of these options or suggest your own, and let's propel the narrative forward! 🌟✨", 'dm', '2025-11-09 04:43:29.100853')
+2025-11-08 23:43:29,102 - sqlalchemy.engine.Engine - INFO - COMMIT

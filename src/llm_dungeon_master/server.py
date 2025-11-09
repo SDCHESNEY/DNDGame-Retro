@@ -201,9 +201,51 @@ async def root():
 
 
 @app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy", "timestamp": datetime.now(UTC).isoformat()}
+async def health_check(db: DBSession = Depends(get_db)):
+    """Health check endpoint with database connectivity check."""
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.now(UTC).isoformat(),
+        "version": "0.1.0",
+        "checks": {}
+    }
+    
+    # Check database connectivity
+    try:
+        db.execute(select(Session).limit(1))
+        health_status["checks"]["database"] = "healthy"
+    except Exception as e:
+        health_status["checks"]["database"] = "unhealthy"
+        health_status["status"] = "degraded"
+        health_status["checks"]["database_error"] = str(e)
+    
+    # Check LLM provider (basic connectivity)
+    try:
+        llm_provider = get_llm_provider()
+        health_status["checks"]["llm_provider"] = "configured"
+        health_status["checks"]["llm_model"] = settings.llm_model
+    except Exception as e:
+        health_status["checks"]["llm_provider"] = "unconfigured"
+        health_status["checks"]["llm_error"] = str(e)
+    
+    return health_status
+
+
+@app.get("/ready")
+async def readiness_check(db: DBSession = Depends(get_db)):
+    """Readiness check endpoint for container orchestration."""
+    try:
+        # Check database is ready
+        db.execute(select(Session).limit(1))
+        return {"status": "ready", "timestamp": datetime.now(UTC).isoformat()}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Service not ready: {str(e)}")
+
+
+@app.get("/live")
+async def liveness_check():
+    """Liveness check endpoint for container orchestration."""
+    return {"status": "alive", "timestamp": datetime.now(UTC).isoformat()}
 
 
 # Session endpoints

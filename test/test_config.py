@@ -103,3 +103,125 @@ def test_port_number_range():
     
     settings.port = 3000
     assert settings.port == 3000
+
+
+# Phase 8: Enhanced Configuration Tests
+
+def test_new_server_host_setting(monkeypatch):
+    """Test new server_host setting."""
+    monkeypatch.setenv("SERVER_HOST", "127.0.0.1")
+    settings = Settings()
+    assert settings.server_host == "127.0.0.1"
+
+
+def test_new_server_port_setting(monkeypatch):
+    """Test new server_port setting."""
+    monkeypatch.setenv("SERVER_PORT", "9000")
+    settings = Settings()
+    assert settings.server_port == 9000
+
+
+def test_llm_model_setting(monkeypatch):
+    """Test llm_model setting."""
+    monkeypatch.setenv("LLM_MODEL", "gpt-4")
+    settings = Settings()
+    assert settings.llm_model == "gpt-4"
+
+
+def test_postgres_settings(monkeypatch):
+    """Test PostgreSQL-specific settings."""
+    monkeypatch.setenv("POSTGRES_DB", "test_db")
+    monkeypatch.setenv("POSTGRES_USER", "test_user")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "test_pass")
+    
+    settings = Settings()
+    assert settings.postgres_db == "test_db"
+    assert settings.postgres_user == "test_user"
+    assert settings.postgres_password == "test_pass"
+
+
+def test_redis_settings(monkeypatch):
+    """Test Redis configuration."""
+    monkeypatch.setenv("REDIS_URL", "redis://localhost:6379")
+    monkeypatch.setenv("REDIS_PASSWORD", "redis_pass")
+    
+    settings = Settings()
+    assert settings.redis_url == "redis://localhost:6379"
+    assert settings.redis_password == "redis_pass"
+
+
+def test_rate_limiting_settings(monkeypatch):
+    """Test rate limiting configuration."""
+    monkeypatch.setenv("RATE_LIMIT_ENABLED", "true")
+    monkeypatch.setenv("RATE_LIMIT_PER_MINUTE", "120")
+    monkeypatch.setenv("RATE_LIMIT_BURST", "20")
+    
+    settings = Settings()
+    assert settings.rate_limit_enabled is True
+    assert settings.rate_limit_per_minute == 120
+    assert settings.rate_limit_burst == 20
+
+
+def test_logging_configuration(monkeypatch):
+    """Test logging settings."""
+    monkeypatch.setenv("LOG_FORMAT", "json")
+    monkeypatch.setenv("LOG_FILE", "/var/log/app.log")
+    monkeypatch.setenv("LOG_MAX_BYTES", "20971520")
+    monkeypatch.setenv("LOG_BACKUP_COUNT", "10")
+    
+    settings = Settings()
+    assert settings.log_format == "json"
+    assert settings.log_file == "/var/log/app.log"
+    assert settings.log_max_bytes == 20971520
+    assert settings.log_backup_count == 10
+
+
+def test_feature_flags(monkeypatch):
+    """Test feature flag settings."""
+    monkeypatch.setenv("ENABLE_WEBSOCKET", "false")
+    monkeypatch.setenv("ENABLE_API_DOCS", "false")
+    monkeypatch.setenv("ENABLE_METRICS", "false")
+    
+    settings = Settings()
+    assert settings.enable_websocket is False
+    assert settings.enable_api_docs is False
+    assert settings.enable_metrics is False
+
+
+def test_is_production_property():
+    """Test is_production property."""
+    settings = Settings()
+    settings.debug = True
+    assert settings.is_production is False
+    
+    settings.debug = False
+    assert settings.is_production is True
+
+
+def test_use_postgresql_property():
+    """Test use_postgresql property."""
+    settings = Settings()
+    
+    settings.database_url = "sqlite:///./data/test.db"
+    assert settings.use_postgresql is False
+    
+    settings.database_url = "postgresql://user:pass@localhost/db"
+    assert settings.use_postgresql is True
+
+
+def test_use_redis_property():
+    """Test use_redis property."""
+    settings = Settings()
+    
+    settings.redis_url = ""
+    assert settings.use_redis is False
+    
+    settings.redis_url = "redis://localhost:6379"
+    assert settings.use_redis is True
+
+
+def test_session_timeout_setting(monkeypatch):
+    """Test session timeout configuration."""
+    monkeypatch.setenv("SESSION_TIMEOUT", "7200")
+    settings = Settings()
+    assert settings.session_timeout == 7200

@@ -1,13 +1,13 @@
 """Tests for CLI UI components."""
 
 import pytest
-from src.llm_dungeon_master.cli_ui import (
+from llm_dungeon_master.cli_ui import (
     ColorScheme,
     Display,
     CommandParser,
     CommandType,
 )
-from src.llm_dungeon_master.cli_ui.colors import get_color_scheme, get_hp_color, get_modifier_color
+from llm_dungeon_master.cli_ui.colors import get_color_scheme, get_hp_color, get_modifier_color
 
 
 class TestColorSchemes:
