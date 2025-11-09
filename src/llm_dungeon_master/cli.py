@@ -371,17 +371,186 @@ def validate_character(character_id: int = typer.Argument(..., help="Character I
 
 
 @app.command()
-def play(session_id: Optional[int] = typer.Option(None, help="Session ID to join")):
-    """Start playing (interactive mode)."""
-    console.print(Panel(
-        "[bold green]🎲 Welcome to LLM Dungeon Master! 🎲[/bold green]\n\n"
-        "[yellow]Interactive play mode coming soon![/yellow]\n\n"
-        "For now, use these commands:\n"
-        "  • [cyan]rpg create-session \"My Game\"[/cyan] - Start a new game\n"
-        "  • [cyan]rpg list-sessions[/cyan] - See all games\n"
-        "  • [cyan]rpg serve[/cyan] - Start the API server\n",
-        border_style="green"
-    ))
+def play(
+    session_id: Optional[int] = typer.Option(None, help="Session ID to join"),
+    color_scheme: str = typer.Option("green", help="Color scheme: green, amber, cga, c64, apple")
+):
+    """Start playing (interactive mode with retro interface)."""
+    from rich.prompt import Prompt
+    from .cli_ui import Display, TitleScreen, MainMenu, CharacterSheetScreen, CombatScreen
+    from .cli_ui import DiceAnimation, CombatAnimation, CommandParser
+    from .cli_ui.colors import ColorScheme
+    
+    # Map color scheme names to enum
+    scheme_map = {
+        "green": ColorScheme.GREEN_PHOSPHOR,
+        "amber": ColorScheme.AMBER_MONITOR,
+        "cga": ColorScheme.IBM_CGA,
+        "c64": ColorScheme.COMMODORE_64,
+        "apple": ColorScheme.APPLE_II,
+    }
+    
+    scheme = scheme_map.get(color_scheme.lower(), ColorScheme.GREEN_PHOSPHOR)
+    display = Display(color_scheme=scheme)
+    parser = CommandParser()
+    
+    # Show title screen
+    title_screen = TitleScreen(display)
+    title_screen.show()
+    
+    # Main game loop
+    running = True
+    while running:
+        # Show main menu
+        main_menu = MainMenu(display)
+        choice = main_menu.show()
+        
+        if choice == "p":
+            # Play mode
+            if not session_id:
+                display.clear()
+                display.show_info("No session selected. Create one first with: rpg create-session")
+                display.pause()
+                continue
+            
+            # TODO: Connect to WebSocket and start game session
+            display.clear()
+            display.show_warning("Game session mode coming soon!")
+            display.console.print("\n[cyan]This will connect to the server and start playing.[/cyan]")
+            display.console.print("[dim]For now, demonstrating the UI components...[/dim]\n")
+            
+            # Demo dice rolling
+            dice = DiceAnimation(display)
+            display.console.print("\n[bold]Rolling for initiative...[/bold]")
+            result = dice.roll(sides=20, modifier=3, label="Initiative")
+            display.pause()
+            
+        elif choice == "c":
+            # Character management
+            display.clear()
+            
+            with DBSession(engine) as db:
+                statement = select(Character).order_by(Character.created_at.desc()).limit(10)
+                characters = db.exec(statement).all()
+                
+                if not characters:
+                    display.show_info("No characters found. Create one with: rpg create-character")
+                    display.pause()
+                    continue
+                
+                # Show character selection
+                display.console.print("\n[bold]Your Characters:[/bold]\n")
+                for i, char in enumerate(characters, 1):
+                    display.console.print(
+                        f"  [{i}] {char.name} - Level {char.level} {char.race} {char.char_class}",
+                        style=display.theme.text
+                    )
+                display.console.print()
+                
+                char_choice = Prompt.ask(
+                    "Select a character (number) or press Enter to go back",
+                    default=""
+                )
+                
+                if char_choice.strip() and char_choice.isdigit():
+                    idx = int(char_choice) - 1
+                    if 0 <= idx < len(characters):
+                        # Show character sheet
+                        character = characters[idx]
+                        
+                        # Convert character to dict for display
+                        char_dict = {
+                            "name": character.name,
+                            "character_class": character.char_class,
+                            "level": character.level,
+                            "race": character.race,
+                            "hp_current": character.current_hp,
+                            "hp_max": character.max_hp,
+                            "armor_class": character.armor_class,
+                            "initiative_bonus": character.initiative_bonus,
+                            "speed": character.speed,
+                            "strength": character.strength,
+                            "dexterity": character.dexterity,
+                            "constitution": character.constitution,
+                            "intelligence": character.intelligence,
+                            "wisdom": character.wisdom,
+                            "charisma": character.charisma,
+                            "skill_proficiencies": character.skill_proficiencies or [],
+                            "equipment": character.equipment or [],
+                            "background": character.background,
+                        }
+                        
+                        char_screen = CharacterSheetScreen(display)
+                        char_screen.show(char_dict)
+            
+        elif choice == "s":
+            # Sessions
+            display.clear()
+            
+            with DBSession(engine) as db:
+                statement = select(Session).order_by(Session.created_at.desc()).limit(10)
+                sessions = db.exec(statement).all()
+                
+                if not sessions:
+                    display.show_info("No sessions found. Create one with: rpg create-session")
+                    display.pause()
+                    continue
+                
+                # Show sessions
+                table = Table(
+                    title="🎲 Game Sessions",
+                    title_style=display.theme.title,
+                    border_style=display.theme.border
+                )
+                table.add_column("ID", style=display.theme.primary)
+                table.add_column("Name", style=display.theme.text)
+                table.add_column("DM", style=display.theme.secondary)
+                table.add_column("Status", style=display.theme.info)
+                
+                for sess in sessions:
+                    status = "Active" if sess.is_active else "Inactive"
+                    table.add_row(str(sess.id), sess.name, sess.dm_name, status)
+                
+                display.print_table(table)
+                display.pause()
+        
+        elif choice == "t":
+            # Change theme
+            display.clear()
+            display.console.print("\n[bold]Available Color Schemes:[/bold]\n")
+            display.console.print("  [1] Green Phosphor (classic terminal)")
+            display.console.print("  [2] Amber Monitor (warm vintage)")
+            display.console.print("  [3] IBM CGA (blue/cyan/magenta)")
+            display.console.print("  [4] Commodore 64 (blue/purple)")
+            display.console.print("  [5] Apple II (green)")
+            display.console.print()
+            
+            theme_choice = Prompt.ask(
+                "Select theme (1-5)",
+                choices=["1", "2", "3", "4", "5"],
+                default="1"
+            )
+            
+            theme_map = {
+                "1": ColorScheme.GREEN_PHOSPHOR,
+                "2": ColorScheme.AMBER_MONITOR,
+                "3": ColorScheme.IBM_CGA,
+                "4": ColorScheme.COMMODORE_64,
+                "5": ColorScheme.APPLE_II,
+            }
+            
+            scheme = theme_map[theme_choice]
+            display = Display(color_scheme=scheme)
+            display.show_success("Theme changed successfully!")
+            display.pause()
+        
+        elif choice == "q":
+            # Quit
+            display.clear()
+            display.console.print("\n[bold]Thanks for playing![/bold]", style=display.theme.title)
+            display.console.print("\n" + display.get_dragon_ascii(), style=display.theme.secondary)
+            display.console.print("\n[dim]May your dice roll true![/dim]\n", style=display.theme.dim)
+            running = False
 
 
 if __name__ == "__main__":
