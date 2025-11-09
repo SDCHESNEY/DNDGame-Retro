@@ -61,6 +61,7 @@ logs/
 # Documentation (not needed in container)
 docs/
 *.md
+!README.md
 
 # Test files (production only)
 test/

@@ -3,7 +3,7 @@
 
 
 # Stage 1: Base image with UV package manager
-FROM python:3.12-slim as base
+FROM python:3.12-slim AS base
 
 # Install system dependencies and UV
 RUN apt-get update && apt-get install -y \
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Add UV to PATH
-ENV PATH="/root/.cargo/bin:$PATH"
+ENV PATH="/root/.local/bin:$PATH"
 
 # Set working directory
 WORKDIR /app
@@ -22,17 +22,17 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 
 # Stage 2: Development environment (with hot reload)
-FROM base as development
+FROM base AS development
+
+# Copy source code first (needed for editable install)
+COPY src/ ./src/
 
 # Install dependencies with UV (development mode)
 RUN uv pip install --system -e .
 
-# Copy source code
-COPY src/ ./src/
-COPY test/ ./test/
-
-# Create non-root user for security
+# Create non-root user for security and data directories
 RUN useradd -m -u 1000 rpguser && \
+    mkdir -p /app/data /app/logs && \
     chown -R rpguser:rpguser /app
 
 USER rpguser
@@ -48,7 +48,7 @@ EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "llm_dungeon_master.server:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Stage 3: Production environment (optimized)
-FROM base as production
+FROM base AS production
 
 # Install dependencies with UV (production mode, no dev dependencies)
 RUN uv pip install --system .
