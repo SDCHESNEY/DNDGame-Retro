@@ -1,6 +1,7 @@
 """FastAPI server with REST API and WebSocket support."""
 
 from contextlib import asynccontextmanager
+from typing import Optional
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel, create_engine, Session as DBSession, select
@@ -8,10 +9,19 @@ from pydantic import BaseModel
 from datetime import datetime, UTC
 
 from .config import settings
-from .models import Session, Player, Character, Message, SessionPlayer
+from .models import (
+    Session, Player, Character, Message, SessionPlayer, Roll, 
+    CombatEncounter, CombatantState, CharacterCondition
+)
 from .llm_provider import get_llm_provider
 from .prompts import get_dm_system_message, get_start_session_message
 from .dm_service import DMService, RateLimitExceeded, TokenLimitExceeded
+from .rules.dice import (
+    roll_dice, resolve_check, resolve_attack, roll_damage, 
+    AdvantageType, RollResult
+)
+from .rules.combat import CombatManager, ActionType
+from .rules.conditions import ConditionManager, ConditionType, DurationType
 
 
 # Database setup
@@ -85,8 +95,10 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# DM Service
+# Services
 dm_service = DMService()
+combat_manager = CombatManager()
+condition_manager = ConditionManager()
 
 
 # Pydantic models for API
@@ -117,6 +129,58 @@ class MessageCreate(BaseModel):
     sender_name: str
     content: str
     message_type: str = "player"
+
+
+class DiceRollRequest(BaseModel):
+    formula: str
+    advantage: int = 0  # -1=disadvantage, 0=normal, 1=advantage
+    character_id: Optional[int] = None
+    context: Optional[str] = None
+
+
+class CheckRequest(BaseModel):
+    ability_score: int
+    dc: int
+    proficiency_bonus: int = 0
+    advantage: int = 0
+    character_id: Optional[int] = None
+    context: Optional[str] = None
+
+
+class AttackRequest(BaseModel):
+    attack_bonus: int
+    target_ac: int
+    advantage: int = 0
+    character_id: Optional[int] = None
+    target_name: Optional[str] = None
+
+
+class DamageRequest(BaseModel):
+    formula: str
+    is_critical: bool = False
+
+
+class CombatStartRequest(BaseModel):
+    character_ids: list[int]
+
+
+class CombatAttackRequest(BaseModel):
+    attacker_id: int
+    target_id: int
+    attack_bonus: int
+    damage_formula: str
+    advantage: int = 0
+
+
+class ConditionRequest(BaseModel):
+    character_id: int
+    character_name: str
+    condition_type: str
+    source: str
+    duration_type: str
+    duration_value: int = 0
+    save_dc: Optional[int] = None
+    save_ability: Optional[str] = None
 
 
 # API Routes
@@ -291,6 +355,482 @@ async def process_action(
 async def get_token_usage(session_id: int):
     """Get token usage statistics for a session."""
     return dm_service.get_token_usage(session_id)
+
+
+# Dice rolling endpoints
+@app.post("/api/sessions/{session_id}/roll")
+async def roll_dice_endpoint(
+    session_id: int,
+    request: DiceRollRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Roll dice with optional advantage/disadvantage."""
+    try:
+        advantage = AdvantageType(request.advantage)
+        result = roll_dice(request.formula, advantage)
+        
+        # Save roll to database
+        db_roll = Roll(
+            session_id=session_id,
+            character_id=request.character_id,
+            roll_type="generic",
+            formula=request.formula,
+            result=result.total,
+            rolls=str(result.rolls),
+            advantage_type=request.advantage,
+            is_critical=result.is_critical,
+            is_critical_fail=result.is_critical_fail,
+            context=request.context
+        )
+        db.add(db_roll)
+        db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "roll",
+            "roll_type": "generic",
+            "formula": request.formula,
+            "result": result.total,
+            "rolls": result.rolls,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail,
+            "context": request.context
+        })
+        
+        return {
+            "formula": result.formula,
+            "total": result.total,
+            "rolls": result.rolls,
+            "advantage_type": result.advantage_type.value,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sessions/{session_id}/check")
+async def ability_check_endpoint(
+    session_id: int,
+    request: CheckRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Resolve an ability check."""
+    try:
+        advantage = AdvantageType(request.advantage)
+        result = resolve_check(
+            request.ability_score,
+            request.dc,
+            request.proficiency_bonus,
+            advantage
+        )
+        
+        # Save roll to database
+        db_roll = Roll(
+            session_id=session_id,
+            character_id=request.character_id,
+            roll_type="check",
+            formula="1d20",
+            result=result.roll,
+            rolls=str([result.roll]),
+            modifier=result.modifier,
+            advantage_type=request.advantage,
+            is_critical=result.is_critical,
+            is_critical_fail=result.is_critical_fail,
+            context=request.context
+        )
+        db.add(db_roll)
+        db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "check",
+            "success": result.success,
+            "roll": result.roll,
+            "dc": result.dc,
+            "total": result.total,
+            "modifier": result.modifier,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail,
+            "context": request.context
+        })
+        
+        return {
+            "success": result.success,
+            "roll": result.roll,
+            "dc": result.dc,
+            "total": result.total,
+            "modifier": result.modifier,
+            "advantage_type": result.advantage_type.value,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sessions/{session_id}/attack")
+async def attack_roll_endpoint(
+    session_id: int,
+    request: AttackRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Resolve an attack roll."""
+    try:
+        advantage = AdvantageType(request.advantage)
+        result = resolve_attack(request.attack_bonus, request.target_ac, advantage)
+        
+        # Save roll to database
+        db_roll = Roll(
+            session_id=session_id,
+            character_id=request.character_id,
+            roll_type="attack",
+            formula="1d20",
+            result=result.roll,
+            rolls=str([result.roll]),
+            modifier=request.attack_bonus,
+            advantage_type=request.advantage,
+            is_critical=result.is_critical,
+            is_critical_fail=result.is_critical_fail,
+            context=f"Attack vs {request.target_name}" if request.target_name else "Attack"
+        )
+        db.add(db_roll)
+        db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "attack",
+            "hit": result.success,
+            "roll": result.roll,
+            "target_ac": result.dc,
+            "total": result.total,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail,
+            "target_name": request.target_name
+        })
+        
+        return {
+            "hit": result.success,
+            "roll": result.roll,
+            "target_ac": result.dc,
+            "total": result.total,
+            "advantage_type": result.advantage_type.value,
+            "is_critical": result.is_critical,
+            "is_critical_fail": result.is_critical_fail
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sessions/{session_id}/damage")
+async def damage_roll_endpoint(
+    session_id: int,
+    request: DamageRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Roll damage with optional critical hit."""
+    try:
+        result = roll_damage(request.formula, request.is_critical)
+        
+        return {
+            "formula": result.formula,
+            "total": result.total,
+            "rolls": result.rolls,
+            "is_critical": request.is_critical
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# Combat endpoints
+@app.post("/api/sessions/{session_id}/combat/start")
+async def start_combat(
+    session_id: int,
+    request: CombatStartRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Start a combat encounter."""
+    try:
+        combat_state = combat_manager.start_combat(db, session_id, request.character_ids)
+        
+        # Save to database
+        db_encounter = CombatEncounter(
+            session_id=session_id,
+            name=f"Combat {datetime.now(UTC).strftime('%Y-%m-%d %H:%M')}",
+            round_number=combat_state.round_number,
+            current_turn_index=combat_state.current_turn_index
+        )
+        db.add(db_encounter)
+        db.commit()
+        db.refresh(db_encounter)
+        
+        # Save combatants
+        for combatant in combat_state.combatants:
+            db_combatant = CombatantState(
+                encounter_id=db_encounter.id,
+                character_id=combatant.character_id,
+                name=combatant.name,
+                initiative=combatant.initiative,
+                current_hp=combatant.current_hp,
+                max_hp=combatant.max_hp,
+                armor_class=combatant.armor_class
+            )
+            db.add(db_combatant)
+        db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "combat_start",
+            "encounter_id": db_encounter.id,
+            "round": combat_state.round_number,
+            "initiative_order": combat_manager.get_initiative_order(session_id),
+            "log": combat_state.combat_log
+        })
+        
+        return {
+            "encounter_id": db_encounter.id,
+            "round": combat_state.round_number,
+            "initiative_order": combat_manager.get_initiative_order(session_id),
+            "current_combatant": combat_state.current_combatant.name if combat_state.current_combatant else None,
+            "combat_log": combat_state.combat_log
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/sessions/{session_id}/combat")
+async def get_combat(session_id: int):
+    """Get current combat state."""
+    combat_state = combat_manager.get_combat(session_id)
+    if not combat_state:
+        raise HTTPException(status_code=404, detail="No active combat")
+    
+    return {
+        "round": combat_state.round_number,
+        "initiative_order": combat_manager.get_initiative_order(session_id),
+        "current_combatant": combat_state.current_combatant.name if combat_state.current_combatant else None,
+        "combat_log": combat_state.combat_log,
+        "is_combat_over": combat_state.is_combat_over
+    }
+
+
+@app.post("/api/sessions/{session_id}/combat/next-turn")
+async def next_turn(session_id: int):
+    """Advance to the next turn in combat."""
+    combat_state = combat_manager.next_turn(session_id)
+    if not combat_state:
+        raise HTTPException(status_code=404, detail="No active combat")
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "combat_next_turn",
+        "round": combat_state.round_number,
+        "current_combatant": combat_state.current_combatant.name if combat_state.current_combatant else None,
+        "is_combat_over": combat_state.is_combat_over
+    })
+    
+    return {
+        "round": combat_state.round_number,
+        "current_combatant": combat_state.current_combatant.name if combat_state.current_combatant else None,
+        "is_combat_over": combat_state.is_combat_over,
+        "combat_log": combat_state.combat_log[-5:]  # Last 5 log entries
+    }
+
+
+@app.post("/api/sessions/{session_id}/combat/attack")
+async def combat_attack(
+    session_id: int,
+    request: CombatAttackRequest
+):
+    """Resolve an attack in combat."""
+    try:
+        advantage = AdvantageType(request.advantage)
+        result = combat_manager.resolve_attack(
+            session_id,
+            request.attacker_id,
+            request.target_id,
+            request.attack_bonus,
+            request.damage_formula,
+            advantage
+        )
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="Combat not found or invalid combatants")
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "combat_attack",
+            "attacker": result.attacker_name,
+            "target": result.target_name,
+            "hit": result.hit,
+            "damage": result.damage,
+            "is_critical": result.is_critical,
+            "attack_roll": result.attack_roll
+        })
+        
+        return {
+            "hit": result.hit,
+            "damage": result.damage,
+            "is_critical": result.is_critical,
+            "attack_roll": result.attack_roll,
+            "target_ac": result.target_ac,
+            "attacker_name": result.attacker_name,
+            "target_name": result.target_name
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sessions/{session_id}/combat/end")
+async def end_combat(session_id: int, db: DBSession = Depends(get_db)):
+    """End the current combat encounter."""
+    if not combat_manager.end_combat(session_id):
+        raise HTTPException(status_code=404, detail="No active combat")
+    
+    # Update database
+    statement = (
+        select(CombatEncounter)
+        .where(CombatEncounter.session_id == session_id)
+        .where(CombatEncounter.is_active == True)
+    )
+    encounter = db.exec(statement).first()
+    if encounter:
+        encounter.is_active = False
+        encounter.ended_at = datetime.now(UTC)
+        db.commit()
+    
+    # Broadcast to WebSocket
+    await manager.broadcast(session_id, {
+        "type": "combat_end",
+        "message": "Combat has ended"
+    })
+    
+    return {"message": "Combat ended"}
+
+
+# Condition endpoints
+@app.post("/api/sessions/{session_id}/conditions")
+async def apply_condition(
+    session_id: int,
+    request: ConditionRequest,
+    db: DBSession = Depends(get_db)
+):
+    """Apply a condition to a character."""
+    try:
+        condition_type = ConditionType(request.condition_type)
+        duration_type = DurationType(request.duration_type)
+        
+        condition = condition_manager.apply_condition(
+            request.character_id,
+            request.character_name,
+            condition_type,
+            request.source,
+            duration_type,
+            request.duration_value,
+            request.save_dc,
+            request.save_ability
+        )
+        
+        # Save to database
+        db_condition = CharacterCondition(
+            character_id=request.character_id,
+            session_id=session_id,
+            condition_type=condition_type.value,
+            source=request.source,
+            duration_type=duration_type.value,
+            duration_value=request.duration_value,
+            rounds_remaining=condition.rounds_remaining,
+            save_dc=request.save_dc,
+            save_ability=request.save_ability
+        )
+        db.add(db_condition)
+        db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "condition_applied",
+            "character_id": request.character_id,
+            "character_name": request.character_name,
+            "condition": condition_type.value,
+            "description": condition.description
+        })
+        
+        return {
+            "condition_type": condition_type.value,
+            "description": condition.description,
+            "duration_type": duration_type.value,
+            "rounds_remaining": condition.rounds_remaining
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid condition or duration type: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/characters/{character_id}/conditions")
+async def get_character_conditions(character_id: int):
+    """Get all conditions affecting a character."""
+    char_conditions = condition_manager.get_conditions(character_id)
+    if not char_conditions:
+        return {"character_id": character_id, "conditions": [], "effects": {}}
+    
+    effects = condition_manager.check_condition_effects(character_id)
+    
+    return {
+        "character_id": character_id,
+        "character_name": char_conditions.character_name,
+        "conditions": [
+            {
+                "type": c.condition_type.value,
+                "description": c.description,
+                "source": c.source,
+                "rounds_remaining": c.rounds_remaining
+            }
+            for c in char_conditions.active_conditions
+        ],
+        "effects": effects
+    }
+
+
+@app.delete("/api/characters/{character_id}/conditions/{condition_type}")
+async def remove_condition(
+    character_id: int,
+    condition_type: str,
+    session_id: int,
+    db: DBSession = Depends(get_db)
+):
+    """Remove a condition from a character."""
+    try:
+        ct = ConditionType(condition_type)
+        success = condition_manager.remove_condition(character_id, ct)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Condition not found")
+        
+        # Update database
+        statement = (
+            select(CharacterCondition)
+            .where(CharacterCondition.character_id == character_id)
+            .where(CharacterCondition.session_id == session_id)
+            .where(CharacterCondition.condition_type == condition_type)
+            .where(CharacterCondition.is_active == True)
+        )
+        db_condition = db.exec(statement).first()
+        if db_condition:
+            db_condition.is_active = False
+            db_condition.removed_at = datetime.now(UTC)
+            db.commit()
+        
+        # Broadcast to WebSocket
+        await manager.broadcast(session_id, {
+            "type": "condition_removed",
+            "character_id": character_id,
+            "condition": condition_type
+        })
+        
+        return {"message": f"Condition {condition_type} removed"}
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid condition type")
 
 
 # WebSocket endpoint

@@ -92,3 +92,73 @@ class Message(SQLModel, table=True):
     
     # Relationships
     session: Session = Relationship(back_populates="messages")
+
+
+class Roll(SQLModel, table=True):
+    """A dice roll made during a session."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    character_id: Optional[int] = Field(default=None, foreign_key="character.id")
+    roll_type: str  # attack, damage, check, save, initiative
+    formula: str  # e.g., "2d6+3"
+    result: int
+    rolls: str  # JSON string of individual die rolls
+    modifier: int = Field(default=0)
+    advantage_type: int = Field(default=0)  # -1=disadvantage, 0=normal, 1=advantage
+    is_critical: bool = Field(default=False)
+    is_critical_fail: bool = Field(default=False)
+    context: Optional[str] = None  # e.g., "Attack vs Goblin", "Perception check"
+    created_at: datetime = Field(default_factory=utc_now)
+
+
+class CombatEncounter(SQLModel, table=True):
+    """A combat encounter in a session."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    name: str  # e.g., "Goblin Ambush"
+    round_number: int = Field(default=1)
+    current_turn_index: int = Field(default=0)
+    is_active: bool = Field(default=True)
+    started_at: datetime = Field(default_factory=utc_now)
+    ended_at: Optional[datetime] = None
+    
+    # Relationships
+    combatants: list["CombatantState"] = Relationship(back_populates="encounter")
+
+
+class CombatantState(SQLModel, table=True):
+    """State of a combatant in an encounter."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    encounter_id: int = Field(foreign_key="combatencounter.id", index=True)
+    character_id: Optional[int] = Field(default=None, foreign_key="character.id")
+    name: str
+    initiative: int
+    current_hp: int
+    max_hp: int
+    armor_class: int
+    is_npc: bool = Field(default=False)
+    is_alive: bool = Field(default=True)
+    
+    # Relationships
+    encounter: CombatEncounter = Relationship(back_populates="combatants")
+
+
+class CharacterCondition(SQLModel, table=True):
+    """A condition affecting a character."""
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    character_id: int = Field(foreign_key="character.id", index=True)
+    session_id: int = Field(foreign_key="session.id", index=True)
+    condition_type: str  # blinded, charmed, frightened, etc.
+    source: str  # What caused the condition
+    duration_type: str  # rounds, minutes, hours, until_save, permanent
+    duration_value: int = Field(default=0)
+    rounds_remaining: Optional[int] = None
+    save_dc: Optional[int] = None
+    save_ability: Optional[str] = None  # Str, Dex, Con, etc.
+    applied_at: datetime = Field(default_factory=utc_now)
+    removed_at: Optional[datetime] = None
+    is_active: bool = Field(default=True)
