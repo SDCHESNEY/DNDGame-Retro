@@ -280,3 +280,96 @@ def test_create_multiple_message_types():
     
     assert len(messages) >= 3
     assert all(any(msg["message_type"] == mt for msg in messages) for mt in message_types)
+
+
+@pytest.mark.asyncio
+async def test_start_dm_session():
+    """Test starting a DM session."""
+    # Create a session
+    session_response = client.post(
+        "/api/sessions",
+        json={"name": "DM Test Session", "dm_name": "Test DM"}
+    )
+    session_id = session_response.json()["id"]
+    
+    # Start DM session
+    response = client.post(f"/api/sessions/{session_id}/start")
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "message" in data
+    assert len(data["message"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_process_action():
+    """Test processing a player action."""
+    # Create a session
+    session_response = client.post(
+        "/api/sessions",
+        json={"name": "Action Test Session", "dm_name": "Test DM"}
+    )
+    session_id = session_response.json()["id"]
+    
+    # Process an action
+    response = client.post(
+        f"/api/sessions/{session_id}/action",
+        params={
+            "player_name": "TestPlayer",
+            "action": "I look around the room"
+        }
+    )
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "message" in data
+    assert len(data["message"]) > 0
+
+
+def test_get_token_usage():
+    """Test getting token usage statistics."""
+    # Create a session
+    session_response = client.post(
+        "/api/sessions",
+        json={"name": "Token Test Session", "dm_name": "Test DM"}
+    )
+    session_id = session_response.json()["id"]
+    
+    # Get token usage (should be zero initially)
+    response = client.get(f"/api/sessions/{session_id}/tokens")
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "used" in data
+    assert "limit" in data
+    assert "remaining" in data
+    assert data["used"] >= 0
+    assert data["limit"] > 0
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_error():
+    """Test that rate limiting returns proper error."""
+    # Create a session
+    session_response = client.post(
+        "/api/sessions",
+        json={"name": "Rate Limit Test", "dm_name": "Test DM"}
+    )
+    session_id = session_response.json()["id"]
+    
+    # Make many requests quickly (should hit rate limit)
+    # Note: Default rate limit is 20/min, but we set it to 5 in tests
+    responses = []
+    for i in range(25):
+        response = client.post(
+            f"/api/sessions/{session_id}/action",
+            params={
+                "player_name": "SpamPlayer",
+                "action": f"Action {i}"
+            }
+        )
+        responses.append(response)
+    
+    # At least one should be rate limited
+    status_codes = [r.status_code for r in responses]
+    assert 429 in status_codes  # Too Many Requests

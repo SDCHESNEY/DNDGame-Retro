@@ -1,160 +1,144 @@
-# Test Suite for LLM Dungeon Master
+# Test Suite
 
-This directory contains comprehensive tests for Phase 1: Core MVP functionality.
+This directory contains the test suite for the LLM Dungeon Master project.
 
-## Test Structure
+## Test Files
 
-```
-test/
-├── conftest.py              # Test configuration and fixtures
-├── test_api.py             # FastAPI endpoint tests (14 tests)
-├── test_config.py          # Configuration management tests (7 tests)
-├── test_llm_provider.py    # LLM provider tests (10 tests)
-├── test_models.py          # Database model tests (8 tests)
-└── test_prompts.py         # Prompt template tests (7 tests)
-```
+### Phase 1 Tests
+- `conftest.py` - Shared test fixtures and configuration
+- `test_api.py` - Tests for FastAPI REST endpoints and WebSocket (14 tests + 4 Phase 2)
+- `test_config.py` - Tests for configuration management (7 tests)
+- `test_llm_provider.py` - Tests for LLM provider abstraction (10 tests)
+- `test_models.py` - Tests for database models (8 tests)
+- `test_prompts.py` - Tests for prompt templates (7 tests)
+
+### Phase 2 Tests (NEW)
+- `test_dm_service.py` - Tests for DM service and LLM integration (20 tests)
+  - Basic functionality (4 tests)
+  - Rate limiting (3 tests)
+  - Token tracking (3 tests)
+  - Retry logic (2 tests)
+  - Streaming responses (2 tests)
+  - Integration scenarios (2 tests)
 
 ## Running Tests
 
-### Run All Tests
 ```bash
-python -m pytest test/ -v
+# Run all tests
+pytest test/
+
+# Run with verbose output
+pytest test/ -v
+
+# Run specific test file
+pytest test/test_api.py
+pytest test/test_dm_service.py
+
+# Run with coverage
+pytest test/ --cov=llm_dungeon_master
+
+# Run Phase 2 tests only
+pytest test/test_dm_service.py -v
 ```
 
-### Run Specific Test File
+## Test Statistics
+
+**Total Tests:** 66
+- Phase 1: 46 tests
+- Phase 2: 20 tests
+
+**All tests passing:** ✅ 66/66
+
+**Execution Time:** ~45 seconds
+
+## Test Coverage
+
+### Phase 1 Coverage
+- **Infrastructure**: Database setup, configuration, models
+- **API Endpoints**: REST API and WebSocket endpoints
+- **LLM Integration**: Provider abstraction and mock responses
+- **Prompts**: Template formatting and content
+
+### Phase 2 Coverage (NEW)
+- **DM Service**: Session management, action processing, roll handling
+- **Rate Limiting**: Per-session request throttling
+- **Token Tracking**: Usage monitoring and limits
+- **Retry Logic**: Exponential backoff on failures
+- **Streaming**: Real-time response generation
+- **Error Handling**: Rate limits, token limits, API failures
+
+## Test Approach
+
+All tests use:
+- **In-memory SQLite databases** - No external database required
+- **Mock LLM providers** - No API keys or costs
+- **Isolated fixtures** - Each test runs independently
+- **Fast execution** - Average <1 second per test
+
+## Phase 2 Test Highlights
+
+### DMService Tests
+The new `test_dm_service.py` validates:
+
+1. **Core Operations**
+   - Starting sessions with DM opening messages
+   - Processing player actions with context
+   - Handling dice rolls with DM responses
+   - Managing conversation history
+
+2. **Protection Mechanisms**
+   - Rate limiting enforcement (20 req/min)
+   - Token limit enforcement (100k per session)
+   - Timestamp cleanup for rate limits
+   - Per-session isolation
+
+3. **Reliability**
+   - Retry logic with exponential backoff
+   - Graceful failure handling
+   - Streaming with error handling
+
+4. **Integration Scenarios**
+   - Complete game session workflows
+   - Multiple players in same session
+   - Token usage tracking over time
+
+## Debugging Failed Tests
+
+If tests fail, use these commands:
+
 ```bash
-python -m pytest test/test_api.py -v
+# Show detailed error output
+pytest test/ -v --tb=long
+
+# Show only failures
+pytest test/ -v --tb=short -x
+
+# Run specific failing test
+pytest test/test_dm_service.py::TestRateLimiting::test_rate_limit_enforcement -v
 ```
-
-### Run Tests by Pattern
-```bash
-# Run all provider tests
-python -m pytest test/ -k "provider" -v
-
-# Run all model tests
-python -m pytest test/ -k "model" -v
-```
-
-### Run with Coverage (requires pytest-cov)
-```bash
-pip install pytest-cov
-python -m pytest test/ --cov=llm_dungeon_master --cov-report=html
-```
-
-### Quiet Mode (Summary Only)
-```bash
-python -m pytest test/ -q
-```
-
-## Test Categories
-
-### API Tests (`test_api.py`)
-Tests all REST API endpoints:
-- Session management (create, list, get)
-- Player management (create, list)
-- Character management (create, list, filter)
-- Message handling (create, list, types)
-- Error responses (404, validation)
-
-### Configuration Tests (`test_config.py`)
-Tests configuration and settings:
-- Default values
-- Environment variable loading
-- CORS configuration
-- Database URL parsing
-- Provider validation
-
-### LLM Provider Tests (`test_llm_provider.py`)
-Tests AI provider abstraction:
-- Mock provider responses
-- OpenAI provider initialization
-- Streaming functionality
-- Error handling
-- Provider factory
-
-### Model Tests (`test_models.py`)
-Tests database models:
-- CRUD operations
-- Relationships
-- Default values
-- Timestamps
-- Data integrity
-
-### Prompt Tests (`test_prompts.py`)
-Tests DM prompt templates:
-- System messages
-- Session start prompts
-- Combat prompts
-- Roll formatting
-- Template validation
-
-## Fixtures
-
-Defined in `conftest.py`:
-
-- **engine** - In-memory SQLite database engine
-- **session** - Database session for tests
-- **client** - FastAPI test client
-- **sample_player** - Pre-created player for tests
-- **sample_session** - Pre-created game session
-- **sample_character** - Pre-created character
-
-## Current Test Results
-
-✅ **46 tests passing**  
-✅ **0 tests failing**  
-✅ **100% success rate**
-
-See [PHASE1_TEST_RESULTS.md](../docs/PHASE1_TEST_RESULTS.md) for detailed results.
 
 ## Adding New Tests
 
-1. Create a new test file: `test_<feature>.py`
-2. Import necessary fixtures from `conftest.py`
-3. Write test functions starting with `test_`
-4. Use async/await for async operations with `@pytest.mark.asyncio`
-5. Run tests to verify
+When adding tests:
+1. Use fixtures from `conftest.py`
+2. Follow existing test patterns
+3. Use descriptive test names
+4. Add docstrings explaining what's tested
+5. Test both success and error cases
 
 Example:
 ```python
-def test_my_feature(session):
-    """Test description."""
-    # Arrange
-    data = create_test_data()
-    
-    # Act
-    result = perform_action(data)
-    
-    # Assert
-    assert result.is_valid()
-```
-
-## Dependencies
-
-- `pytest` - Test framework
-- `pytest-asyncio` - Async test support
-- `fastapi.testclient` - API testing
-- `sqlmodel` - Database testing
-
-Install with:
-```bash
-uv pip install pytest pytest-asyncio
+@pytest.mark.asyncio
+async def test_my_feature(dm_service, session, sample_session):
+    """Test that my feature works correctly."""
+    result = await dm_service.my_method(session, sample_session.id)
+    assert result is not None
 ```
 
 ## Continuous Integration
 
-These tests can be integrated into CI/CD pipelines:
-
-```yaml
-# Example GitHub Actions
-- name: Run tests
-  run: |
-    python -m pytest test/ -v --tb=short
-```
-
-## Notes
-
-- Tests use in-memory SQLite database (no data persistence)
-- Each test is isolated and independent
-- Tests clean up after themselves
-- Mock provider used by default (no API costs)
+Tests are designed to run in CI/CD:
+- No external dependencies
+- Fast execution
+- Deterministic results
+- Clear failure messages

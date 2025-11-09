@@ -5,12 +5,13 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depe
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel, create_engine, Session as DBSession, select
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, UTC
 
 from .config import settings
 from .models import Session, Player, Character, Message, SessionPlayer
 from .llm_provider import get_llm_provider
 from .prompts import get_dm_system_message, get_start_session_message
+from .dm_service import DMService, RateLimitExceeded, TokenLimitExceeded
 
 
 # Database setup
@@ -84,6 +85,9 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+# DM Service
+dm_service = DMService()
+
 
 # Pydantic models for API
 class SessionCreate(BaseModel):
@@ -129,7 +133,7 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    return {"status": "healthy", "timestamp": datetime.now(UTC).isoformat()}
 
 
 # Session endpoints
@@ -244,12 +248,56 @@ async def create_message(
     return db_message
 
 
+# DM Service endpoints
+@app.post("/api/sessions/{session_id}/start")
+async def start_dm_session(session_id: int, db: DBSession = Depends(get_db)):
+    """Start a session with DM opening message."""
+    try:
+        response = await dm_service.start_session(db=db, session_id=session_id)
+        return {"message": response}
+    except RateLimitExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except TokenLimitExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/sessions/{session_id}/action")
+async def process_action(
+    session_id: int,
+    player_name: str,
+    action: str,
+    db: DBSession = Depends(get_db)
+):
+    """Process a player action and get DM response."""
+    try:
+        response = await dm_service.process_player_action(
+            db=db,
+            session_id=session_id,
+            player_name=player_name,
+            action=action
+        )
+        return {"message": response}
+    except RateLimitExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except TokenLimitExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/sessions/{session_id}/tokens")
+async def get_token_usage(session_id: int):
+    """Get token usage statistics for a session."""
+    return dm_service.get_token_usage(session_id)
+
+
 # WebSocket endpoint
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: int):
     """WebSocket endpoint for real-time game communication."""
     await manager.connect(websocket, session_id)
-    llm_provider = get_llm_provider()
     
     try:
         # Send welcome message
@@ -258,69 +306,108 @@ async def websocket_endpoint(websocket: WebSocket, session_id: int):
             "content": f"Connected to session {session_id}"
         })
         
+        # Send token usage info
+        token_stats = dm_service.get_token_usage(session_id)
+        await websocket.send_json({
+            "type": "system",
+            "content": f"Token usage: {token_stats['used']}/{token_stats['limit']}"
+        })
+        
         while True:
             # Receive message from client
             data = await websocket.receive_json()
-            
-            # Save player message to database
-            with DBSession(engine) as db:
-                player_msg = Message(
-                    session_id=session_id,
-                    sender_name=data.get("sender", "Player"),
-                    content=data.get("content", ""),
-                    message_type="player"
-                )
-                db.add(player_msg)
-                db.commit()
+            message_type = data.get("type", "action")
+            sender = data.get("sender", "Player")
+            content = data.get("content", "")
             
             # Broadcast player message to all clients
             await manager.broadcast(session_id, {
                 "type": "message",
-                "sender": data.get("sender", "Player"),
-                "content": data.get("content", ""),
+                "sender": sender,
+                "content": content,
                 "message_type": "player"
             })
             
-            # Get conversation history
-            with DBSession(engine) as db:
-                statement = (
-                    select(Message)
-                    .where(Message.session_id == session_id)
-                    .order_by(Message.created_at.desc())
-                    .limit(10)
-                )
-                recent_messages = list(reversed(db.exec(statement).all()))
-            
-            # Build conversation for LLM
-            conversation = [get_dm_system_message()]
-            for msg in recent_messages:
-                role = "assistant" if msg.message_type == "dm" else "user"
-                conversation.append({
-                    "role": role,
-                    "content": f"{msg.sender_name}: {msg.content}"
+            try:
+                # Process based on message type
+                if message_type == "action":
+                    # Handle player action with DMService
+                    with DBSession(engine) as db:
+                        # Use streaming response
+                        full_response = []
+                        async for chunk in dm_service.generate_stream(
+                            db=db,
+                            session_id=session_id,
+                            player_name=sender,
+                            action=content
+                        ):
+                            full_response.append(chunk)
+                            # Stream chunk to all clients
+                            await manager.broadcast(session_id, {
+                                "type": "stream",
+                                "sender": "Dungeon Master",
+                                "content": chunk
+                            })
+                        
+                        # Send end of stream marker
+                        await manager.broadcast(session_id, {
+                            "type": "stream_end",
+                            "sender": "Dungeon Master",
+                            "full_content": "".join(full_response)
+                        })
+                
+                elif message_type == "roll":
+                    # Handle dice roll
+                    roll_type = data.get("roll_type", "check")
+                    result = data.get("result", 10)
+                    dice = data.get("dice", "1d20")
+                    modifier = data.get("modifier", 0)
+                    
+                    with DBSession(engine) as db:
+                        dm_response = await dm_service.handle_roll(
+                            db=db,
+                            session_id=session_id,
+                            player_name=sender,
+                            roll_type=roll_type,
+                            result=result,
+                            dice=dice,
+                            modifier=modifier
+                        )
+                    
+                    # Broadcast DM response
+                    await manager.broadcast(session_id, {
+                        "type": "message",
+                        "sender": "Dungeon Master",
+                        "content": dm_response,
+                        "message_type": "dm"
+                    })
+                
+                # Send updated token usage
+                token_stats = dm_service.get_token_usage(session_id)
+                await websocket.send_json({
+                    "type": "token_usage",
+                    "used": token_stats['used'],
+                    "limit": token_stats['limit'],
+                    "remaining": token_stats['remaining']
+                })
+                
+            except RateLimitExceeded as e:
+                await websocket.send_json({
+                    "type": "error",
+                    "content": f"Rate limit exceeded: {str(e)}"
                 })
             
-            # Get DM response
-            dm_response = await llm_provider.generate_response(conversation)
+            except TokenLimitExceeded as e:
+                await websocket.send_json({
+                    "type": "error",
+                    "content": f"Token limit exceeded: {str(e)}"
+                })
             
-            # Save DM response to database
-            with DBSession(engine) as db:
-                dm_msg = Message(
-                    session_id=session_id,
-                    sender_name="Dungeon Master",
-                    content=dm_response,
-                    message_type="dm"
-                )
-                db.add(dm_msg)
-                db.commit()
-            
-            # Broadcast DM response
-            await manager.broadcast(session_id, {
-                "type": "message",
-                "sender": "Dungeon Master",
-                "content": dm_response,
-                "message_type": "dm"
-            })
+            except Exception as e:
+                await websocket.send_json({
+                    "type": "error",
+                    "content": f"Error processing message: {str(e)}"
+                })
             
     except WebSocketDisconnect:
         manager.disconnect(websocket, session_id)
